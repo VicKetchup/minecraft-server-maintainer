@@ -179,8 +179,7 @@ function printFrames() {
 }
 
 function runInstaller() {
-    chmod +x server-installer
-    ./server-installer
+    ./maintainer.sh module=server-installer
 }
 
 jarName="spigot.jar"
@@ -204,19 +203,20 @@ if [[ "$hasTmux" -ne "0" ]]; then
     sudo apt install tmux
 fi
 
-# TODO: Download maintainer from git and execute wtih server-installer module if it is available, if not, download it from the maintainer-modules folder in the repository and execute it, place holder git URL = <git-url>, execute using ssh
-# Download maintainer script from git and execute it if available - AI genereted
-if git clone https://github.com/VicKetchup/minecraft-server-maintainer maintainer-script; then
-    centerAndPrintString "\e[43;30mGit clone successful. Executing the maintainer script..."
-    cd maintainer-script
-    runInstaller
-    cd ..
-else
-    echo "Git clone failed. Trying to download from repository's maintainer-modules folder..."
-    if wget https://github.com/VicKetchup/minecraft-server-maintainer; then
-        echo "\e[43;30mDownload successful. Executing the maintainer script..."
+if ! [ -d "$maintainerModulesPath" ]; then
+    # TODO: Download maintainer from git and execute wtih server-installer module if it is available, if not, download it from the maintainer-modules folder in the repository and execute it, place holder git URL = <git-url>, execute using ssh
+    # Download maintainer script from git and execute it if available - AI genereted
+    if git clone https://github.com/VicKetchup/minecraft-server-maintainer minecraft-server-maintainer; then
+        centerAndPrintString "\e[43;30mGit clone successful. Executing the maintainer script..."
+        cd minecraft-server-maintainer
         runInstaller
     else
-        echo "\e[41mDownload failed. The maintainer script is not available."
+        centerAndPrintString "\e[42mGit clone failed. Trying to download from repository's maintainer-modules folder..."
+        if wget https://github.com/VicKetchup/minecraft-server-maintainer; then
+            echo "\e[43;30mDownload successful. Executing the maintainer script..."
+            runInstaller
+        else
+            echo "\e[41mDownload failed. The maintainer script is not available."
+        fi
     fi
 fi
