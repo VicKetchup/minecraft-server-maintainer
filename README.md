@@ -20,12 +20,13 @@ This guide assumes you got a bare metal Ubuntu machine to run your server on.
 7. Type `./easyMaintainer.sh` and hit ENTER.
 If you find any issues, please submit them to GitHub 🙂
 
-Usage
+### Usage
+
 To setup your username, follow instructions in provided maintainer-usernames.txt file.
 
-Contributing
-Contributions are always welcome!
+### Contributing
 
+Contributions are always welcome!
 1. Fork the project
 2. Create your Feature Branch (git checkout -b feature/AmazingFeature)
 3. Commit your Changes (git commit -m 'Add some AmazingFeature')
