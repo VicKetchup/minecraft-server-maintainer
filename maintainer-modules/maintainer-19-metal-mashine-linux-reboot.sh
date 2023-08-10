@@ -1,7 +1,7 @@
 #!/bin/bash
 run=false
 defaultForceRun="false"
-defaultTmuxName="prison"
+defaultTmuxName="server"
 numberReg='^[0-9]+$'
 defaultMaintainerPath=/home/ubuntu
 

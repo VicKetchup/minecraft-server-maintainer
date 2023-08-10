@@ -1,6 +1,6 @@
 #!/bin/bash
 success=false
-defaultTmuxName="prison"
+defaultTmuxName="server"
 defaultFormat="&4"
 defaultMaintainerPath=/home/ubuntu
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 success=false
-defaultTmuxName="prison"
+defaultTmuxName="server"
 defaultUsername=$USER
 defaultMaintainerPath=/home/ubuntu
 

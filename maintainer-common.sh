@@ -178,10 +178,15 @@ function printFrames() {
     fi
 }
 
+function runInstaller() {
+    chmod +x server-installer
+    ./server-installer
+}
+
 jarName="spigot.jar"
-defaultTmuxName=prison
+defaultTmuxName=server
 defaultMaintainerPath=/home/ubuntu
-defaultPath=$defaultMaintainerPath/Bedrock_Prison_Server
+defaultPath=$defaultMaintainerPath/server
 maintainerMainUser=ubuntu
 
 if ! [ ${tmuxName:+1} ]; then
@@ -201,19 +206,17 @@ fi
 
 # TODO: Download maintainer from git and execute wtih server-installer module if it is available, if not, download it from the maintainer-modules folder in the repository and execute it, place holder git URL = <git-url>, execute using ssh
 # Download maintainer script from git and execute it if available - AI genereted
-# if git clone <git-url> maintainer-script; then
-#     echo "Git clone successful. Executing the maintainer script..."
-#     cd maintainer-script
-#     chmod +x server-installer
-#     ./server-installer
-#     cd ..
-# else
-#     echo "Git clone failed. Trying to download from repository's maintainer-modules folder..."
-#     if wget <repository-url>/maintainer-modules/server-installer; then
-#         echo "Download successful. Executing the maintainer script..."
-#         chmod +x server-installer
-#         ./server-installer
-#     else
-#         echo "Download failed. The maintainer script is not available."
-#     fi
-# fi
+if git clone https://github.com/VicKetchup/minecraft-server-maintainer maintainer-script; then
+    centerAndPrintString "\e[43;30mGit clone successful. Executing the maintainer script..."
+    cd maintainer-script
+    runInstaller
+    cd ..
+else
+    echo "Git clone failed. Trying to download from repository's maintainer-modules folder..."
+    if wget https://github.com/VicKetchup/minecraft-server-maintainer; then
+        echo "\e[43;30mDownload successful. Executing the maintainer script..."
+        runInstaller
+    else
+        echo "\e[41mDownload failed. The maintainer script is not available."
+    fi
+fi

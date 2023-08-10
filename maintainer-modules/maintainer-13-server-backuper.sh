@@ -1,7 +1,7 @@
 #!/bin/bash
 success=false
-defaultTmuxName=prison
-defaultServerFolder=Bedrock_Prison_Server
+defaultTmuxName=server
+defaultServerFolder=server
 defaultServerStop='false'
 defaultServerRestart='true'
 defaultMode=root # allowed values: local, root

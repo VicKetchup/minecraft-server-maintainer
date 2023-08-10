@@ -1,9 +1,9 @@
 #!/bin/bash
 success=false
-defaultTmuxName=prison
+defaultTmuxName=server
 defaultColour='false'
 defaultMaintainerPath=/home/ubuntu
-defaultServerFolder=Bedrock_Prison_Server
+defaultServerFolder=server
 
 for ARGUMENT in "$@"
 do

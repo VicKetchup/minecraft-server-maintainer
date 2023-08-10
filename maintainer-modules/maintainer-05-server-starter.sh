@@ -1,13 +1,13 @@
 #!/bin/bash
 success=false
-ramDefault=16
+ramDefault=8
 ramToUse=0 # is overwritten later
 numberReg='^[0-9]+$'
 maintainerExecution=false
 defaultMaintainerPath=/home/ubuntu
-defaultPath=$defaultMaintainerPath/Bedrock_Prison_Server
+defaultPath=$defaultMaintainerPath/server
 defaultJarName=spigot
-defaultTmuxName=prison
+defaultTmuxName=server
 
 for ARGUMENT in "$@"
 do

@@ -1,7 +1,7 @@
 #!/bin/bash
 success=false
 forceStart="false"
-defaultTmuxName=prison
+defaultTmuxName=server
 defaultMaintainerPath=/home/ubuntu
 
 for ARGUMENT in "$@"

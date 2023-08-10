@@ -1,10 +1,10 @@
 #!/bin/bash
 resize >/dev/null
-# clear
+
 # Default arguments
-demo=false
-logSize=250
-clearForFrames=false
+demo=true
+logSize=50
+clearForFrames=true
 run=true
 defaultUsername=$USER
 timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
@@ -370,7 +370,7 @@ else
             tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
             echo Attaching to new tmux session...
             tmux -S /var/maintainer-tmux/maintainer attach -t maintainer
-            # clear
+            
             realExit=false
             run=false
         else
@@ -399,7 +399,7 @@ else
                     updateArgsToPassForNewExecution
                     tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
                     # tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "clear 2&>/dev/null" ENTER
-                    # clear
+                    
                 else
                     echo "Rejoining running script"
                     echo "$timestamp: Rejoining running script" >> $maintainerPath/maintainer-log.txt
@@ -418,7 +418,7 @@ else
             echo "$timestamp: Re-starting maintainer session" >> $maintainerPath/maintainer-log.txt
             updateArgsToPassForNewExecution
             tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
-            # clear
+            
         fi
     fi
 

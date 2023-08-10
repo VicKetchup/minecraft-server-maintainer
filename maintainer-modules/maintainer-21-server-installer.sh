@@ -1,7 +1,7 @@
 #!/bin/bash
-defaultTmuxName="prison"
+defaultTmuxName="server"
 defaultMaintainerPath=/home/ubuntu
-defaultPath=$defaultMaintainerPath/Bedrock_Prison_Server
+defaultPath=$defaultMaintainerPath/
 defaultJarName=spigot
 numberReg='^[0-9]+$'
 
