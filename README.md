@@ -5,13 +5,17 @@ This guide assumes you got a bare metal Ubuntu machine to run your server on.
 ## Prerequisites
 
 - Ubuntu 18.04 LTS
-- Puttygen `https://puttygen.com/download.php?val=49`
-- Pageant `https://puttygen.com/download.php?val=43`
-- Putty `https://puttygen.com/download.php?val=13`
+- Puttygen
+  `https://puttygen.com/download.php?val=49`
+- Pageant
+  `https://puttygen.com/download.php?val=43`
+- Putty
+  `https://puttygen.com/download.php?val=13`
 
 ## Installation
 
-1. Clone the repo ```git clone https://github.com/VicKetchup/minecraft-server-maintainer.git```
+1. Clone the repo
+`git clone https://github.com/VicKetchup/minecraft-server-maintainer.git`
 2. Generate RSA Hash256 key (default) using putty-gen and save both public and private keys in a secure location.
 3. Run pageant (open from system tray) and add the saved private key to it.
 4. Add public key to authorized_keys in .ssh.
