@@ -1,0 +1,254 @@
+Welcome to Maintainer log!
+Here you will find all data on execution of Maintainer script :)
+
+<<<--- TRUNCATED LOGS --->>>
+2023-08-10-09-19-39: VicKetchup has started 'enter-console' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-09-19-42: Was module run successful: true
+2023-08-10-09-19-52: VicKetchup has started 'server-stopper' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-09-20-04: Was module run successful: true
+2023-08-10-09-20-16: VicKetchup has started 'server-restarter' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-09-20-18: Was module run successful: true
+2023-08-10-09-20-54: VicKetchup has started 'server-status' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-09-20-54: Was module run successful: true
+2023-08-10-09-21-30: VicKetchup has started 'server-status' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-09-21-31: Was module run successful: true
+2023-08-10-09-21-50: VicKetchup has started 'enter-console' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-09-21-59: Was module run successful: true
+2023-08-10-09-21-59: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=aa8d1d4d-c0d2-4fc8-a2f5-f4b30975e0aa username=VicKetchup
+<< aa8d1d4d-c0d2-4fc8-a2f5-f4b30975e0aa
+
+>> e76b7f6f-b62c-43fc-9261-1f5216656a38
+2023-08-10-09-23-20: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=e76b7f6f-b62c-43fc-9261-1f5216656a38
+2023-08-10-09-23-21: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=e76b7f6f-b62c-43fc-9261-1f5216656a38 username=VicKetchup
+<< e76b7f6f-b62c-43fc-9261-1f5216656a38
+
+>> 098b23b5-5ccb-460a-9164-5aaaca5d4746
+2023-08-10-09-31-09: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=098b23b5-5ccb-460a-9164-5aaaca5d4746
+2023-08-10-09-31-10: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=098b23b5-5ccb-460a-9164-5aaaca5d4746 username=VicKetchup
+<< 098b23b5-5ccb-460a-9164-5aaaca5d4746
+
+>> deb3da2e-2df0-45dd-907a-666f7eb8d12d
+2023-08-10-09-44-47: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=deb3da2e-2df0-45dd-907a-666f7eb8d12d
+2023-08-10-09-44-47: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=deb3da2e-2df0-45dd-907a-666f7eb8d12d username=VicKetchup
+<< deb3da2e-2df0-45dd-907a-666f7eb8d12d
+
+>> b767c31d-8712-4293-8bee-a753e535afa0
+2023-08-10-09-45-27: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=b767c31d-8712-4293-8bee-a753e535afa0
+
+>> e261a8e3-56fe-4dc7-9503-c905889890e7
+2023-08-10-09-46-01: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-message-console message="Server restarting in 15 minutes and start back up within 10 minutes :)" exitOnEnd=true sessionId=e261a8e3-56fe-4dc7-9503-c905889890e7
+2023-08-10-09-46-01: Another session is running, waiting 60 seconds to try again for session: e261a8e3-56fe-4dc7-9503-c905889890e7
+
+2023-08-10-09-45-27: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=b767c31d-8712-4293-8bee-a753e535afa0 username=VicKetchup
+<< b767c31d-8712-4293-8bee-a753e535afa0
+
+>> 2db386b9-5596-4f81-be94-86637bd30e94
+2023-08-10-09-46-15: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=2db386b9-5596-4f81-be94-86637bd30e94
+2023-08-10-09-46-15: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=2db386b9-5596-4f81-be94-86637bd30e94 username=VicKetchup
+<< 2db386b9-5596-4f81-be94-86637bd30e94
+
+>> 4c085490-10a8-48aa-8a38-9741b1a29334
+2023-08-10-09-46-39: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=4c085490-10a8-48aa-8a38-9741b1a29334
+2023-08-10-09-46-39: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=4c085490-10a8-48aa-8a38-9741b1a29334 username=VicKetchup
+<< 4c085490-10a8-48aa-8a38-9741b1a29334
+
+>> 52e2c040-720a-4185-9814-3d9dc6aea8e1
+2023-08-10-09-47-02: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=52e2c040-720a-4185-9814-3d9dc6aea8e1
+2023-08-10-09-47-03: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=52e2c040-720a-4185-9814-3d9dc6aea8e1 username=VicKetchup
+<< 52e2c040-720a-4185-9814-3d9dc6aea8e1
+
+>> fc9ac39c-387c-4c68-a819-18c6989cc0d9
+2023-08-10-09-56-01: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-message-console message="Server restarting in 5 minutes" exitOnEnd=true sessionId=fc9ac39c-387c-4c68-a819-18c6989cc0d9
+2023-08-10-09-56-04: cron-daily has started 'server-message-console' module with arguments: username=cron-daily message="Server restarting in 5 minutes" sessionId=fc9ac39c-387c-4c68-a819-18c6989cc0d9 isMaintainerRun=true
+2023-08-10-09-56-04: Was module run successful: true
+2023-08-10-09-56-04: cron-daily has exited the script
+Args were:  username=cron-daily message="Server restarting in 5 minutes" sessionId=fc9ac39c-387c-4c68-a819-18c6989cc0d9 isMaintainerRun=true module=server-message-console
+<< fc9ac39c-387c-4c68-a819-18c6989cc0d9
+
+>> 9414454d-1d35-4da8-a765-044055056eee
+2023-08-10-10-00-01: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-message-console message="Server restarting in 1 minute" exitOnEnd=true sessionId=9414454d-1d35-4da8-a765-044055056eee
+2023-08-10-10-00-03: cron-daily has started 'server-message-console' module with arguments: username=cron-daily message="Server restarting in 1 minute" sessionId=9414454d-1d35-4da8-a765-044055056eee isMaintainerRun=true
+2023-08-10-10-00-03: Was module run successful: true
+2023-08-10-10-00-03: cron-daily has exited the script
+Args were:  username=cron-daily message="Server restarting in 1 minute" sessionId=9414454d-1d35-4da8-a765-044055056eee isMaintainerRun=true module=server-message-console
+<< 9414454d-1d35-4da8-a765-044055056eee
+
+>> 6ccdf341-067f-4577-b2e3-ab8f2be497cb
+2023-08-10-10-00-30: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-message-console message="Server restarting in 30 seconds" exitOnEnd=true sessionId=6ccdf341-067f-4577-b2e3-ab8f2be497cb
+2023-08-10-10-00-32: cron-daily has started 'server-message-console' module with arguments: username=cron-daily message="Server restarting in 30 seconds" sessionId=6ccdf341-067f-4577-b2e3-ab8f2be497cb isMaintainerRun=true
+2023-08-10-10-00-32: Was module run successful: true
+2023-08-10-10-00-32: cron-daily has exited the script
+Args were:  username=cron-daily message="Server restarting in 30 seconds" sessionId=6ccdf341-067f-4577-b2e3-ab8f2be497cb isMaintainerRun=true module=server-message-console
+<< 6ccdf341-067f-4577-b2e3-ab8f2be497cb
+
+>> 6d6a0d1c-4298-4d1a-a9a7-f3c230a44edb
+2023-08-10-10-00-50: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-message-console message="Server restarting in 10 seconds" exitOnEnd=true sessionId=6d6a0d1c-4298-4d1a-a9a7-f3c230a44edb
+2023-08-10-10-00-52: cron-daily has started 'server-message-console' module with arguments: username=cron-daily message="Server restarting in 10 seconds" sessionId=6d6a0d1c-4298-4d1a-a9a7-f3c230a44edb isMaintainerRun=true
+2023-08-10-10-00-52: Was module run successful: true
+2023-08-10-10-00-52: cron-daily has exited the script
+Args were:  username=cron-daily message="Server restarting in 10 seconds" sessionId=6d6a0d1c-4298-4d1a-a9a7-f3c230a44edb isMaintainerRun=true module=server-message-console
+<< 6d6a0d1c-4298-4d1a-a9a7-f3c230a44edb
+
+>> 8d1e1b65-d800-4d3a-ad9b-cf1d7c9c4aab
+2023-08-10-10-00-57: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-message-console message="Server restarting in: 3" exitOnEnd=true sessionId=8d1e1b65-d800-4d3a-ad9b-cf1d7c9c4aab
+
+>> 13a3c83c-001a-445d-8603-d196a65f4ba4
+2023-08-10-10-00-58: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-message-console message=2 exitOnEnd=true sessionId=13a3c83c-001a-445d-8603-d196a65f4ba4
+
+>> 5dc7921d-6b04-44bf-83d7-f7e5626a1af6
+2023-08-10-10-00-59: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-message-console message=1 exitOnEnd=true sessionId=5dc7921d-6b04-44bf-83d7-f7e5626a1af6
+2023-08-10-10-01-02: cron-daily has started 'server-message-console' module with arguments: username=cron-daily message=1 sessionId=5dc7921d-6b04-44bf-83d7-f7e5626a1af6 isMaintainerRun=true
+2023-08-10-10-01-02: Was module run successful: true
+
+>> f6ed42b3-bf09-4672-8bc8-1af813d25a4d
+2023-08-10-10-01-02: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=metal-mashine-linux-reboot forceRun=true exitOnEnd=true sessionId=f6ed42b3-bf09-4672-8bc8-1af813d25a4d
+2023-08-10-10-01-04: cron-daily has started 'metal-mashine-linux-reboot' module with arguments: username=cron-daily forceRun=true sessionId=f6ed42b3-bf09-4672-8bc8-1af813d25a4d isMaintainerRun=true
+2023-08-10-10-01-04: Was module run successful: true
+2023-08-10-10-01-04: cron-daily has exited the script
+Args were:  username=cron-daily forceRun=true sessionId=f6ed42b3-bf09-4672-8bc8-1af813d25a4d isMaintainerRun=true module=metal-mashine-linux-reboot
+<< f6ed42b3-bf09-4672-8bc8-1af813d25a4d
+
+>> 6a42e349-9dc0-4cf7-80ec-9b8826be8457
+2023-08-10-10-06-01: ### Started new maintainer execution ###
+Script started by user: cron-daily
+Script was started with following Args: username=cron-daily module=server-starter exitOnEnd=true sessionId=6a42e349-9dc0-4cf7-80ec-9b8826be8457
+2023-08-10-10-06-04: cron-daily has started 'server-starter' module with arguments: username=cron-daily sessionId=6a42e349-9dc0-4cf7-80ec-9b8826be8457 isMaintainerRun=true
+2023-08-10-10-06-04: Was module run successful: false
+2023-08-10-10-06-04: cron-daily has exited the script
+Args were:  username=cron-daily sessionId=6a42e349-9dc0-4cf7-80ec-9b8826be8457 isMaintainerRun=true module=server-starter
+<< 6a42e349-9dc0-4cf7-80ec-9b8826be8457
+
+>> 2c30e5fc-ab97-4fa8-9dfc-a0433a576b46
+2023-08-10-10-18-10: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=2c30e5fc-ab97-4fa8-9dfc-a0433a576b46
+2023-08-10-10-18-46: VicKetchup has started 'print-loadscreen' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-18-46: Was module run successful: false
+2023-08-10-10-18-46: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=2c30e5fc-ab97-4fa8-9dfc-a0433a576b46 username=VicKetchup
+<< 2c30e5fc-ab97-4fa8-9dfc-a0433a576b46
+
+>> da5a2a89-2309-4f83-b6da-e84e63cd9c0e
+2023-08-10-10-23-25: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=da5a2a89-2309-4f83-b6da-e84e63cd9c0e
+2023-08-10-10-23-32: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-23-32: Was module run successful: true
+2023-08-10-10-23-32: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=da5a2a89-2309-4f83-b6da-e84e63cd9c0e username=VicKetchup
+<< da5a2a89-2309-4f83-b6da-e84e63cd9c0e
+
+>> 25b0caff-2bc2-43cf-ab65-c90b641858ab
+2023-08-10-10-29-29: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=25b0caff-2bc2-43cf-ab65-c90b641858ab
+2023-08-10-10-29-35: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-29-35: Was module run successful: true
+2023-08-10-10-29-35: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=25b0caff-2bc2-43cf-ab65-c90b641858ab username=VicKetchup
+<< 25b0caff-2bc2-43cf-ab65-c90b641858ab
+
+>> cf0f0173-7112-4ab2-a682-90d00f34fcdc
+2023-08-10-10-36-07: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=cf0f0173-7112-4ab2-a682-90d00f34fcdc
+2023-08-10-10-36-13: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-36-13: Was module run successful: true
+2023-08-10-10-37-48: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-37-48: Was module run successful: true
+2023-08-10-10-37-48: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=cf0f0173-7112-4ab2-a682-90d00f34fcdc username=VicKetchup
+<< cf0f0173-7112-4ab2-a682-90d00f34fcdc
+
+>> cea8ec98-2608-484f-920a-41fa9e1461f6
+2023-08-10-10-42-31: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=cea8ec98-2608-484f-920a-41fa9e1461f6
+2023-08-10-10-42-38: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-42-38: Was module run successful: true
+2023-08-10-10-42-38: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=cea8ec98-2608-484f-920a-41fa9e1461f6 username=VicKetchup
+<< cea8ec98-2608-484f-920a-41fa9e1461f6
+
+>> 65fc07c3-428b-4d4b-964e-408e26d50ee0
+2023-08-10-10-47-29: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=65fc07c3-428b-4d4b-964e-408e26d50ee0
+2023-08-10-10-47-39: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-47-39: Was module run successful: false
+2023-08-10-10-47-39: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=65fc07c3-428b-4d4b-964e-408e26d50ee0 username=VicKetchup
+<< 65fc07c3-428b-4d4b-964e-408e26d50ee0
+
+>> ff272ac8-1e87-430a-a9e8-a2b483c3f92a
+2023-08-10-10-48-25: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=ff272ac8-1e87-430a-a9e8-a2b483c3f92a
+2023-08-10-10-48-29: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-48-29: Was module run successful: false
+2023-08-10-10-48-29: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=ff272ac8-1e87-430a-a9e8-a2b483c3f92a username=VicKetchup
+<< ff272ac8-1e87-430a-a9e8-a2b483c3f92a
+
+>> 7805b76d-00bb-46aa-b2a2-66f822947afa
+2023-08-10-10-49-47: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=7805b76d-00bb-46aa-b2a2-66f822947afa
+2023-08-10-10-49-52: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-49-52: Was module run successful: false
+2023-08-10-10-51-01: VicKetchup has started 'server-installer' module with arguments: isMaintainerRun=true username=VicKetchup
+2023-08-10-10-51-01: Was module run successful: false
+2023-08-10-10-51-01: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=7805b76d-00bb-46aa-b2a2-66f822947afa username=VicKetchup
+<< 7805b76d-00bb-46aa-b2a2-66f822947afa
+
+>> 146003f6-dac9-4874-bde0-03634d36b9f1
+2023-08-10-10-52-34: ### Started new maintainer execution ###
+Script started by user: VicKetchup
+Script was started with following Args: easyMode=true isMaintainerRun=true sessionId=146003f6-dac9-4874-bde0-03634d36b9f1
+2023-08-10-10-52-42: VicKetchup has started 'print-loadscreen' module with arguments: isMaintainerRun=true username=VicKetchup
+Example Message: Please implement 'success' variable
+2023-08-10-10-52-42: Was module run successful: true
+2023-08-10-10-52-42: VicKetchup has exited the script
+Args were:  easyMode=true isMaintainerRun=true sessionId=146003f6-dac9-4874-bde0-03634d36b9f1 username=VicKetchup
+<< 146003f6-dac9-4874-bde0-03634d36b9f1
