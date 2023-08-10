@@ -6,11 +6,11 @@ This guide assumes you got a bare metal Ubuntu machine to run your server on.
 
 - Ubuntu 18.04 LTS
 - Puttygen
-  `https://puttygen.com/download.php?val=49`
+  - `https://puttygen.com/download.php?val=49`
 - Pageant
-  `https://puttygen.com/download.php?val=43`
+  - `https://puttygen.com/download.php?val=43`
 - Putty
-  `https://puttygen.com/download.php?val=13`
+  - `https://puttygen.com/download.php?val=13`
 
 ## Installation
 
