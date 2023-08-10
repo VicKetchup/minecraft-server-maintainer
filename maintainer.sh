@@ -480,6 +480,7 @@ else
             longestModuleNameLength=15
             for eachfile in $yourfilenames
             do
+                chmod +x $eachfile
                 filenamenoext=${eachfile%.*}
                 niceModuleName="${filenamenoext#*-[0-9]*-}"
                 if [ ${#niceModuleName} -gt $longestModuleNameLength ]; then
