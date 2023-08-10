@@ -1,7 +1,7 @@
 #!/bin/bash
 defaultTmuxName="server"
 defaultMaintainerPath=/home/ubuntu
-defaultPath=$defaultMaintainerPath/
+defaultPath=$defaultMaintainerPath/server
 defaultJarName=spigot
 numberReg='^[0-9]+$'
 
@@ -33,26 +33,26 @@ maintainerModulesPath=$maintainerPath/maintainer-modules
 source $maintainerPath/maintainer-common.sh
 
 function notInstalled() {
-    if [ -d "${defaultPath}/$jarName.jar" ]; then
-        centerAndPrintString "\e[042mServer is already installed! Location:\e[0m"
-        centerAndPrintString "\e[044m${defaultPath}/$jarName.jar\e[0m"
-        false
+    if compgen -G "$path/$jarName.jar"; then
+        return 0
     else
-        true
+        centerAndPrintString "\e[042;30mServer is already installed! Location:\e[0m"
+        centerAndPrintString "\e[044m$path/$jarName\e[0m"
+        return 1
     fi
 }
 
 function download() {
     if wget -O "https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/116/downloads/paper-1.20.1-116.jar" "$defaultPath/$jarName.jar" > /dev/null; then
-        true
+        return 1
     else
-        false
+        return 0
     fi
 }
 
 function start() {
     started=1
-    if [ -d "${maintainerModulesPath}/maintainer-[0-9]*-server-starter.sh" ]; then
+    if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-starter.sh"; then
         if /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-starter.sh skipSuccessLog=true; then
             started=0
         fi
