@@ -23,7 +23,7 @@ This guide assumes you got a bare metal Ubuntu machine to run your server on.
 6. Login as `<your-user>`.
 7. Type
   - `./easyMaintainer.sh`
-8 Hit `ENTER`
+8. Hit `ENTER`
 
 If you find any issues, please submit them to GitHub 🙂
 
