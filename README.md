@@ -44,7 +44,7 @@ License
 Distributed under the MIT License. See ` LICENSE ` for more information.
 
 <p align="center">
-  <img src="art/pc_Co_logo.png?raw=true" width=40%><img src="art/pc_logo.png?raw=tru" width=43.2%>
+  <img src="art/pc_Co_logo.png?raw=true" height=200px><img src="art/pc_logo.png?raw=tru" height=200px>
 </p>
 
 ## Contact
