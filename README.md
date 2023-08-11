@@ -1,5 +1,7 @@
 # Minecraft Server-Maintainer
 
+<!-- ![alt text](https://github.com/VicKetchup/minecraft-server-maintainer/blob/master/art/easyMaintainer.png?raw=true) -->
+![alt text](relative%20art/easyMaintainer.png?raw=true "easyMaintainer")
 This guide assumes you got a bare metal Ubuntu machine to run your server on.
 
 ## Prerequisites
@@ -41,8 +43,11 @@ Contributions are always welcome!
 5. Open a Pull Request
 License
 Distributed under the MIT License. See ` LICENSE ` for more information.
+<!-- ![alt text](https://github.com/VicKetchup/minecraft-server-maintainer/blob/master/art/easyMaintainer.png?raw=true) -->
+![alt text](relative%20art/pc_Co_logo.png?raw=true "Ketchup&Co.")
+![alt text](relative%20art/pc_logo.png?raw=true "Server-Maintainer")
+## Contact
 
-Contact
 Viktor Tkachuk - `vicketchup@gmail.com`
 
 Project Link: `https://github.com/VicKetchup/minecraft-server-maintainer`
