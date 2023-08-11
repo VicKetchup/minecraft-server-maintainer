@@ -182,14 +182,21 @@ function runInstaller() {
     ./maintainer.sh module=server-installer
 }
 
-jarName="spigot.jar"
+
+defaultJarName=spigot
 defaultTmuxName=server
 defaultMaintainerPath=/home/ubuntu
 defaultPath=$defaultMaintainerPath/server
 maintainerMainUser=ubuntu
 
+if ! [ ${jarName:+1} ]; then
+    jarName=$defaultJarName
+fi
 if ! [ ${tmuxName:+1} ]; then
     tmuxName=$defaultTmuxName
+fi
+if ! [ ${path:+1} ]; then
+    path=$defaultPath
 fi
 if ! [ ${maintainerPath:+1} ]; then
     maintainerPath=$defaultMaintainerPath

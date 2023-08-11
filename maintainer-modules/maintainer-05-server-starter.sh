@@ -22,6 +22,25 @@ done
 if ! [ ${maintainerPath:+1} ]; then
     maintainerPath=$defaultMaintainerPath
 fi
+if [ ${ram:+1} ]; then
+    if ! [[ $ram =~ $numberReg ]]; then
+        ramToUse=$ramDefault
+        if ! $maintainerExecution; then
+            centerAndPrintString "\e[041mProvided RAM parameter is not a number, using default value: \e[044m$ramToUse\e[0m\n"
+        fi
+    fi
+else
+    ramToUse=$ramDefault
+fi
+if ! [ ${path:+1} ]; then
+    path=$defaultPath
+fi
+if ! [ ${jarName:+1} ]; then
+    jarName=$defaultJarName
+fi
+if ! [ ${tmuxName:+1} ]; then
+    tmuxName=$defaultTmuxName
+fi
 
 # Functions
 source $maintainerPath/maintainer-common.sh
@@ -43,29 +62,6 @@ else
     # Code
     if [ ${isMaintainerRun:+1} ] && [ $isMaintainerRun=true ]; then
         maintainerExecution=true
-    fi
-
-    if [ ${ram:+1} ]; then
-        if ! [[ $ram =~ $numberReg ]]; then
-            ramToUse=$ramDefault
-            if ! $maintainerExecution; then
-                centerAndPrintString "\e[041mProvided RAM parameter is not a number, using default value: \e[044m$ramToUse\e[0m\n"
-            fi
-        fi
-    else
-        ramToUse=$ramDefault
-    fi
-
-    if ! [ ${path:+1} ]; then
-        path=$defaultPath
-    fi
-
-    if ! [ ${jarName:+1} ]; then
-        jarName=$defaultJarName
-    fi
-
-    if ! [ ${tmuxName:+1} ]; then
-        tmuxName=$defaultTmuxName
     fi
 
     sudo chmod g+ws /var/$tmuxName-tmux/$tmuxName

@@ -1,6 +1,5 @@
 #!/bin/bash
 resize >/dev/null
-
 # Default arguments
 demo=true
 logSize=50
@@ -15,6 +14,8 @@ defaultNewExecution="true"
 endScriptCommand=false
 updateTmuxOwnership=false
 defaultMaintainerPath=/home/ubuntu
+defaultPath=$defaultMaintainerPath/server
+defaultJarName=spigot
 maintainerMainUser=ubuntu
 
 # Get passed arguments
@@ -46,6 +47,11 @@ if ! [ ${isMaintainerRun:+1} ]; then
 fi
 if ! [ ${newExecution:+1} ]; then
     newExecution=$defaultNewExecution
+fi
+if ! [ ${jarName:+1} ]; then
+    jarName=$defaultJarName
+    allArgs+=("jarName"="$jarName")
+    argsToPass+=("jarName"="$jarName")
 fi
 
 # Functions
@@ -370,13 +376,11 @@ else
             tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
             echo Attaching to new tmux session...
             tmux -S /var/maintainer-tmux/maintainer attach -t maintainer
-            
             realExit=false
             run=false
         else
             if [ ${currentTmux:+1} ]; then
                 previousSessionId=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=> Session ID: ).{36}'`
-                # tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "clear 2&>/dev/null" ENTER
                 echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
                 echo -e \\"e[044mYou are already in a maintainer tmux session!\\e[0m\\n"
             elif ! $isDetached && ! $reEnter; then
@@ -398,8 +402,6 @@ else
                     echo "No script running, launching maintainer script"
                     updateArgsToPassForNewExecution
                     tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
-                    # tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "clear 2&>/dev/null" ENTER
-                    
                 else
                     echo "Rejoining running script"
                     echo "$timestamp: Rejoining running script" >> $maintainerPath/maintainer-log.txt
@@ -418,7 +420,6 @@ else
             echo "$timestamp: Re-starting maintainer session" >> $maintainerPath/maintainer-log.txt
             updateArgsToPassForNewExecution
             tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
-            
         fi
     fi
 
