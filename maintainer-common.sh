@@ -1,8 +1,17 @@
+#!/bin/bash
+defaultJarName=spigot
+defaultTmuxName=server
+defaultMaintainerPath=/home/ubuntu
+defaultPath=$defaultMaintainerPath/server
+maintainerMainUser=ubuntu
+if [ "$TERM_PROGRAM" != tmux ]; then
+    resize >/dev/null
+fi
 function getVisibleLength() {
     local string="$1"
     # echo "getVisibleLength: input string: $string" >&2
     # Remove all escape sequences
-    string=$(echo -n "$string" | sed -r 's/\\e\[[0-9;]*[a-zA-Z]//g')
+    string=$(echo -n "$string" | sed -r 's/(\\e|\\033)\[[0-9;]*[a-zA-Z]//g')
     # Remove newline characters and literal \n sequences
     string="${string//$'\n'}"
     string="${string//\\n}"
@@ -21,29 +30,32 @@ function centerAndPrintString() {
     else
         stringToCenter="$1"
     fi
-    # echo "centerAndPrintString: input string: $stringToCenter" >&2
     windowWidth=$(tput cols)
-    # echo "centerAndPrintString: window width: $windowWidth" >&2
 
     # Extract the background color from the input string
     backgroundColor=$(echo -n "$stringToCenter" | grep -oP '(?<=\\e\[)[0-9;]*m' | head -n 1)
-    # echo "centerAndPrintString: backgroundColor: $backgroundColor" >&2
 
     # Calculate the visible string length (excluding escape sequences)
-    visibleStringLength=$(getVisibleLength "$stringToCenter")
-    # echo "centerAndPrintString: visible string length: $visibleStringLength" >&2
+    visibleStringToCenterLength=$(getVisibleLength "$stringToCenter")
+    if [ -n  "$leftEdgeSymbols" ]; then
+        visibleEdgesLength=$(getVisibleLength "${leftEdgeSymbols}${rightEdgeSymbols}")
+        visibleStringLength=$(( visibleStringToCenterLength + visibleEdgesLength ))
+    else
+        visibleStringLength=$(( visibleStringToCenterLength ))
+    fi
 
     # Calculate the spaces needed for centering
     centeringSpacesLength=$(( (windowWidth - visibleStringLength) / 2 ))
-    # echo "centerAndPrintString: centering spaces length: $centeringSpacesLength" >&2
 
     # Print the background color for the entire line
     printf "\033[${backgroundColor}"
+    printf "${leftEdgeSymbols}"
     for ((i = 0; i < windowWidth; i++)); do
         printf " "
     done
-    printf "\n"
-
+    if [ -z  "$leftEdgeSymbols" ]; then
+        printf "\n"
+    fi
     # Move the cursor back up one line
     tput cuu1
 
@@ -53,9 +65,15 @@ function centerAndPrintString() {
     fi
 
     # Print the centered string with escape sequences intact
-    echo -e "$stringToCenter\c"
+    printf "$stringToCenter"
 
-    # Move the cursor to the next line
+    endCenteringSpacesLength=$(( windowWidth - centeringSpacesLength - visibleStringLength ))
+    if [[ $endCenteringSpacesLength -gt 0 ]]; then
+        printf "%${endCenteringSpacesLength}s"
+    fi
+    printf "${rightEdgeSymbols}\033[0m"
+
+    ## Move the cursor to the next line
     tput cud1
 
     # Reset the color
@@ -64,34 +82,36 @@ function centerAndPrintString() {
     # Clear to end of line
     tput el
 
-    # Reset the variables for the next string13
+    # Reset the variables for the next string
     unset stringToCenter
+    unset leftEdgeSymbols
+    unset rightEdgeSymbols
 }
 
 footer=" \e[0m© \e[40;33mProduct of \e[31mVicKetchup\e[33m of \e[31mKetchup \e[37m& \e[31mCo\e[37m.\e[33m Please respect the copyright \e[0m© "
 
 function printFrame1() {
     echo
-    centerAndPrintString "\e[0m \e[41m              \e[030m⛏  \e[033mServer\e[37m-\e[033mMaintainer \e[030m⛏             \e[0m "
+    centerAndPrintString "\e[0m \e[41m              \e[030m⛏  \e[033mServer\e[30m-\e[033mMaintainer \e[030m⛏             \e[0m "
     centerAndPrintString "\e[0m \e[41;37m \e[30m⛏  \e[41;37m¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤\e[30m ⚒  \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m S  \e[41;37m¤ \e[40;30m                                     \e[41;37m ¤\e[33m S  \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m e  \e[41;37m¤ \e[40;30m                                     \e[41;37m ¤\e[33m e  \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m r  \e[41;37m¤ \e[40;30m    \e[43;33m                             \e[40;30m    \e[41;37m ¤\e[33m r  \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m v  \e[41;37m¤ \e[40;30m    \e[43;33m                             \e[40;30m    \e[41;37m ¤\e[33m v  \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m e  \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m e  \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m r\e[37m- \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m r\e[37m- \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  M \e[41;37m¤ \e[43;33m     \e[47m    \e[44m    \e[43;33m           \e[44m    \e[47m    \e[43;33m     \e[41;37m ¤\e[33m  M \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  a \e[41;37m¤ \e[43;33m     \e[47m    \e[44m    \e[43;33m           \e[44m    \e[47m    \e[43;33m     \e[41;37m ¤\e[33m  a \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  i \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  i \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  n \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  n \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  t \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  t \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  a \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  a \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  i \e[41;37m¤ \e[43;33m        \e[43;30m ▀▀▃▃▃\e[43;33m         \e[43;30m▃▃▃▀▀ \e[33m        \e[41;37m ¤\e[33m  i \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  n \e[41;37m¤ \e[43;33m              \e[43;30m▀▀▀▀▀▀▀▀▀\e[33m              \e[41;37m ¤\e[33m  n \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  e \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  e \e[0m "
-    centerAndPrintString "\e[0m \e[41;33m  r \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  r \e[0m "
+    centerAndPrintString "\e[0m \e[41;37m    \e[41;37m¤ \e[40;30m                                     \e[41;37m ¤\e[37m    \e[0m "
+    centerAndPrintString "\e[0m \e[41;37m    \e[41;37m¤ \e[40;30m                                     \e[41;37m ¤\e[37m    \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m K  \e[41;37m¤ \e[40;30m    \e[43;33m                             \e[40;30m    \e[41;37m ¤\e[33m  K \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m e  \e[41;37m¤ \e[40;30m    \e[43;33m                             \e[40;30m    \e[41;37m ¤\e[33m  e \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m t  \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  t \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m c  \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  c \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m h  \e[41;37m¤ \e[43;33m     \e[47m    \e[44m    \e[43;33m           \e[44m    \e[47m    \e[43;33m     \e[41;37m ¤\e[33m  h \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m u  \e[41;37m¤ \e[43;33m     \e[47m    \e[44m    \e[43;33m           \e[44m    \e[47m    \e[43;33m     \e[41;37m ¤\e[33m  u \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m p  \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  p \e[0m "
+    centerAndPrintString "\e[0m \e[41;30m &  \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[30m  & \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m C  \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  C \e[0m "
+    centerAndPrintString "\e[0m \e[41;33m o  \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[33m  o \e[0m "
+    centerAndPrintString "\e[0m \e[41;37m.   \e[41;37m¤ \e[43;33m        \e[43;30m ▀▀▃▃▃\e[43;33m         \e[43;30m▃▃▃▀▀ \e[33m        \e[41;37m ¤\e[37m   .\e[0m "
+    centerAndPrintString "\e[0m \e[41;37m    \e[41;37m¤ \e[43;33m              \e[43;30m▀▀▀▀▀▀▀▀▀\e[33m              \e[41;37m ¤\e[37m    \e[0m "
+    centerAndPrintString "\e[0m \e[41;37m    \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[37m    \e[0m "
+    centerAndPrintString "\e[0m \e[41;37m    \e[41;37m¤ \e[43;33m                                     \e[41;37m ¤\e[37m    \e[0m "
     centerAndPrintString "\e[0m \e[41;37m \e[30m⚔  \e[41;37m¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤\e[30m ⛑  \e[0m "
-    centerAndPrintString "\e[0m \e[41m              \e[030m⛏  \e[033mServer\e[37m-\e[033mMaintainer \e[030m⛏             \e[0m "
+    centerAndPrintString "\e[0m \e[41m              \e[030m⛏  \e[033mServer\e[30m-\e[033mMaintainer \e[030m⛏             \e[0m "
     echo
     centerAndPrintString "$footer"
     sleep $1;
@@ -125,20 +145,19 @@ function printFrame0() {
 }
 
 function printLogo() {
-    clear
     centerAndPrintString "\e[0m               ▄█▀▀▀▀▀▀█▄█\e[047m▀▒▒▒▒▒▒▒▒▀\e[0m█▄▄\e[0m"
-    centerAndPrintString "\e[0m                 \e[040m█        █\e[047m▒▒▒\e[0m         ▀██▀\e[0m"
-    centerAndPrintString "\e[0m                  \e[040m█        █▒    ██\e[0m☰☰☰☰☰☰█\e[0m"
-    centerAndPrintString "\e[0m                   \e[040m█    ▒     █▄ █\e[0m   \e[044m▒☠ ▒█\e[0m"
-    centerAndPrintString "\e[0m                   \e[040m▄\e[047m▀\e[040m▄     ▄      ██\e[0m  \e[044m▒▒▒\e[047m█\e[0m"
-    centerAndPrintString "\e[0m    \e[043m▄\e[0m              \e[040m█▒▒▀▀▄▄▄     ▒▒███\e[0m    ▄\e[047m▀\e[0m▀\e[047m█\e[0m"
-    centerAndPrintString "\e[0m         \e[041m▒█▒\e[0m            \e[040m█▒▒▒▒    ▀▄▀▒   ▒▒▀█████▒▒██▄\e[0m   ▒"
-    centerAndPrintString "\e[0m       ▄\e[041m█ █\e[0m▄          \e[041m█▒▒▒▒▒▒▒▒▒▒▒\e[040m█▒▒    ▒▒▒██▒▒\e[041m▀▀\e[43m▀▀\e[0m▄▄▄"
+    centerAndPrintString "\e[0m                 \e[040m█         █\e[047m▒▒▒\e[0m         ▀██▀\e[0m"
+    centerAndPrintString "\e[0m                 \e[040m█         █▒    ██\e[0m☰☰☰☰☰☰█\e[0m"
+    centerAndPrintString "\e[0m                  ▀\e[040m█    ▒     █▄ █\e[0m   \e[044m▒☠ ▒█\e[0m"
+    centerAndPrintString "\e[0m                   \e[040m \e[047m▀\e[040m▄     ▄      ██\e[0m  \e[044m▒▒▒\e[047m█\e[0m"
+    centerAndPrintString "\e[0m    \e[043m▄\e[0m                \e[040m▄▀▒▀▄▄▄    ▒▒███\e[0m    ▄\e[047m▀\e[0m▀\e[047m█\e[0m"
+    centerAndPrintString "\e[0m         \e[041m▒█▒\e[0m             ▄\e[040m▀▒▒▒▒▒ ▀▄▀▒   ▒▒▀█████▒▒██▄\e[0m   ▒"
+    centerAndPrintString "\e[0m       ▄\e[041m█ █\e[0m▄          ▄\e[041m█▒▒▒▒▒▒▒▒▒▒\e[040m█▒▒    ▒▒▒██▒▒\e[041m▀▀\e[43m▀▀\e[0m▄▄▄"
     centerAndPrintString "\e[0m    \e[041m█▒ ▒█\e[0m         ▄\e[041m▀            █\e[0m█▒▒▒▒▒▀████████ \e[0m"
     centerAndPrintString "\e[0m   \e[041m█▒  ▒█\e[0m       ▄\e[041m▀                 \e[040m██▒▒▒▒▒█ ▒ ▒ █\e[0m"
     centerAndPrintString "\e[0m   \e[041m█▒  ▒\e[0m█▀      \e[041m█ \e[037mKetchup&Co. █      \e[0m██ █ █      █ \e[0m"
     centerAndPrintString "\e[0m  \e[041m█▒▒ ▒█\e[0m      \e[041m█             █\e[0m \e[41m█      \e[040m█  \e[0m██      █\e[0m"
-    centerAndPrintString "\e[0m   \e[041m█▒▒\e[0m \e[41m▒█\e[0m      \e[041m█             █\e[0m  \e[041m█      \e[040m█   \e[040m█    █\e[0m "
+    centerAndPrintString "\e[0m  \e[041m█▒▒\e[0m \e[41m▒█\e[0m      \e[041m█             █\e[0m  \e[041m█      \e[040m█   \e[040m█    █\e[0m "
     centerAndPrintString "\e[0m  \e[040m█\e[41m▒\e[0m   █    \e[41m█              █\e[040m   \e[041m█▒▒▒▒▒▒█\e[040m   █   █\e[0m"
     centerAndPrintString "\e[0m     \e[040m█    █\e[0m   \e[041m█             █\e[0m     \e[040m█      \e[040m▀█▄▀    █\e[0m "
     centerAndPrintString "\e[0m    \e[040m█    █\e[0m   \e[041m█             █\e[0m      \e[040m█             █\e[0m"
@@ -154,26 +173,28 @@ function printLogo() {
 
 function printFrames() {
     if $1; then
-        centerAndPrintString "\e[43m \e[31m⚠\e[30m | \e[37m⛏  \e[30mServer\e[31m-\e[30mMaintainer \e[37mis \e[32mLoading... |\e[31m⚠\e[30m "
+        leftEdgeSymbols=" \e[30m|\e[31m ⚠ \e[30m |"
+        rightEdgeSymbols="\e[30m |\e[31m ⚠ \e[30m |"
+        centerAndPrintString "\e[43m\e[30m | \e[37m⛏  \e[30mServer\e[31m-\e[30mMaintainer \e[31mis \e[30mLoading...\e[30m |"
     fi
     if $demo; then
         if $1; then
-            printLogo 2
+            printLogo 1
         fi
         printFrame0 0.1
-        if ! $2; then 
+        if $2; then 
             clear; 
         fi
-        printFrame1 0.8
+        printFrame1 0.3
     else
         if $1; then
-            printLogo 1.3
-            printFrame1 0.7
+            printLogo 0.5
+            printFrame1 0.2
         else
-            printFrame1 0.8
+            printFrame1 0.3
         fi
     fi
-    if ! $2; then 
+    if $2; then 
         clear; 
     fi
 }
@@ -181,13 +202,6 @@ function printFrames() {
 function runInstaller() {
     ./maintainer.sh module=server-installer
 }
-
-
-defaultJarName=spigot
-defaultTmuxName=server
-defaultMaintainerPath=/home/ubuntu
-defaultPath=$defaultMaintainerPath/server
-maintainerMainUser=ubuntu
 
 if ! [ ${jarName:+1} ]; then
     jarName=$defaultJarName

@@ -94,7 +94,7 @@ else
         javaRAMBytes=$(ps aux | grep java | grep -v grep | awk '{print $6}')
         javaRam=$(echo "scale=2; $javaRAMBytes / 1024 / 1024" | bc)
         storageTakenUpByBackups=$(cd /backups; du -sh --exclude "./lost+found" | awk '{print $1}' | awk '{print $1}'; cd ~)
-        infoString2="\e[47;30mcpu-usage\e[0m\e[44m=$cpuColor$javaCPU%\e[0m\e[44m | \e[47;30mram-usage\e[0m\e[44m=$RAMColor$javaRAMPercent%\e[0m\e[44m | ram-raw=${javaRam}G | backups-size=${storageTakenUpByBackups}"
+        infoString2="\e[47;30mcpu-usage\e[0m\e[44m=$cpuColor$javaCPU%%\e[0m\e[44m | \e[47;30mram-usage\e[0m\e[44m=$RAMColor$javaRAMPercent%%\e[0m\e[44m | ram-raw=${javaRam}G | backups-size=${storageTakenUpByBackups}"
         
         serverStatusData=$(curl -s -H "Accept: application/json" -H "Content-Type: application/json" -X GET "https://api.mcstatus.io/v2/status/java/198.27.69.163")
         infoString3="version=$(jq -r '.version.name_raw' <<<"$serverStatusData") | host=$(jq -r '.host' <<<"$serverStatusData") | port=$(jq -r '.port' <<<"$serverStatusData")"

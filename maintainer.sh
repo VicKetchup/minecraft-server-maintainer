@@ -90,7 +90,7 @@ function login() {
                     case $selectedusername in
                         "Free-type")
                             freeTypeUsername
-                            break
+                            break;
                         ;;
                         *) 
                             usernameIndex=$(($REPLY - 1))
@@ -135,13 +135,17 @@ function login() {
 }
 
 function freeTypeUsername {
-    echo -e \\"e[042;30m> Please enter your username or hit ENTER to use \\e[043m $defaultUsername \\e[0m"
+    echo -e \\"e[42;30m> Please enter your \\e[31musername\\e[30m, hit \\e[44;37m ENTER \\e[42;30m to use \\e[43m $defaultUsername \\e[42m, or type \\e[47m'exit'\\e[42m to quit :)\\e[0m"
                 
     read givenName
     if [[ "$givenName" != "" ]]; then
-        if [[ "${givenName}" == *"${usernames[*]}"* ]]; then
+        usernames_string=$(IFS='|'; echo "${usernames[*]}")
+        if [[ "${givenName}" =~ ^($usernames_string)$ ]]; then
             echo -e \\"e[041m> This username is reserved for SSH login! Please select another username.\\e[0m\\n"
             freeTypeUsername
+        elif [[ "${givenName}" == "exit" ]]; then
+            run=false
+            realExit=true
         else
             username=$givenName
         fi
@@ -249,7 +253,7 @@ function cleanUpLogs() {
     fileLines=`wc -l ${maintainerPath}/maintainer-log.txt | awk '{print $1}'`
     logSizeWithLines=`echo "$logSize + 3" | bc`
     if [[ "$fileLines" -gt "$logSize" ]]; then
-        centerAndPrintString "\e[47m30mCleaning up maintainer-log.txt..."
+        centerAndPrintString "\e[47;30mCleaning up maintainer-log.txt..."
         touch ${maintainerPath}/temp-maintainer-log.txt
         head -n 3 ${maintainerPath}/maintainer-log.txt >> ${maintainerPath}/temp-maintainer-log.txt
         echo "<<<--- TRUNCATED LOGS --->>>" >> $maintainerPath/temp-maintainer-log.txt
@@ -295,7 +299,7 @@ else
         unset connectionsha
         currentsshconnection=(`echo $SSH_CONNECTION`)
         if [[ "$currentsshconnection" != "" ]]; then
-            connectioninfo=`sudo grep -F " from ${currentsshconnection[0]} port ${currentsshconnection[1]} " /var/log/auth.log | grep ssh`
+            connectioninfo=`sudo grep -F " from ${currentsshconnection[0]} port ${currentsshconnection[1]} " /var/log/auth.log | grep ssh | tail -n 1`
             connectionsha=${connectioninfo#*SHA256:}
             shas=(`sed -n '2p;' ${maintainerPath}/maintainer-usernames.txt`)
         fi
@@ -309,381 +313,375 @@ else
 
     moduleRunSuccess="none ran"
     endScriptCommandString="not set"
-    updateOwnerships
-    if [ ! -f "${maintainerPath}/maintainer-log.txt" ]; then
-        echo "Welcome to Maintainer log!" >> $maintainerPath/maintainer-log.txt
-        echo "Here you will find all data on execution of Maintainer script :)" >> $maintainerPath/maintainer-log.txt
-    fi
-    if [[ "${newExecution}" == "true" ]]; then
-        lastLogString=$(tail -n 1 ${maintainerPath}/maintainer-log.txt)
-        if ! [ -z "$lastLogString" ]; then
-            echo >> $maintainerPath/maintainer-log.txt
+    if $run; then
+        updateOwnerships
+        if [ ! -f "${maintainerPath}/maintainer-log.txt" ]; then
+            echo "Welcome to Maintainer log!" >> $maintainerPath/maintainer-log.txt
+            echo "Here you will find all data on execution of Maintainer script :)" >> $maintainerPath/maintainer-log.txt
         fi
-        echo ">> $sessionId" >> $maintainerPath/maintainer-log.txt
-        echo "$timestamp: ### Started new maintainer execution ###" >> $maintainerPath/maintainer-log.txt
-        echo "Script started by user: $username" >> $maintainerPath/maintainer-log.txt
-        echo "Script was started with following Args: ${allArgs[*]}" >> $maintainerPath/maintainer-log.txt
-        realExit=false
-    fi
-
-    # Session managment
-    if [ ${exitOnEnd:+1} ] && [[ "${exitOnEnd}" == "true" ]] && [[ "${newExecution}" == "true" ]]; then
-        if ! $killedHangingSession; then
-            echo "$timestamp: exitOnEnd was set to true, checking for other sessions" >> $maintainerPath/maintainer-log.txt
-        fi
-        otherSessionsRunning=true
-        printBlankLine=false
-        while $otherSessionsRunning;
-        do
-            checkAttachedStatus
-            if $isDetached; then
-                if $printBlankLine; then
-                    echo >> $maintainerPath/maintainer-log.txt
-                fi
-                otherSessionsRunning=false
-            else
-                printBlankLine=true
-
-                unset scriptJustStartedPossibleString
-                scriptJustStarted="Script was started with following Args"*
-                scriptJustStartedPossibleString=$(tail -n 1 ${maintainerPath}/maintainer-log.txt)
-                if [ -z "$scriptJustStartedPossibleString" ]; then
-                    head -n -1 ${maintainerPath}/maintainer-log.txt > ${maintainerPath}/temp-maintainer-log.txt; mv ${maintainerPath}/temp-maintainer-log.txt ${maintainerPath}/maintainer-log.txt
-                elif [[ $scriptJustStartedPossibleString != $scriptJustStarted ]]; then
-                    echo >> $maintainerPath/maintainer-log.txt
-                fi
-
-                timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
-                echo "Another session is running, waiting 60 seconds to try again..."
-                echo "$timestamp: Another session is running, waiting 60 seconds to try again for session: $sessionId" >> $maintainerPath/maintainer-log.txt
+        if [[ "${newExecution}" == "true" ]]; then
+            lastLogString=$(tail -n 1 ${maintainerPath}/maintainer-log.txt)
+            if ! [ -z "$lastLogString" ]; then
                 echo >> $maintainerPath/maintainer-log.txt
-                updateOwnerships
-                sleep 60
             fi
-        done
-    else
-        checkAttachedStatus
-    fi
-    updateOwnerships
-    if [[ "${newExecution}" == "true" ]]; then
-        tmux -S /var/maintainer-tmux/maintainer has-session -t maintainer 2>/dev/null
-        if [ $? != 0 ] && [ -n $currentTmux ]; then
-            if ! $killedHangingSession; then
-                echo No maintainer sessions detected...
-            fi
-            tmux -S /var/maintainer-tmux/maintainer new-session -s maintainer -d
-            updateArgsToPassForNewExecution
-            tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
-            echo Attaching to new tmux session...
-            tmux -S /var/maintainer-tmux/maintainer attach -t maintainer
+            echo ">> $sessionId" >> $maintainerPath/maintainer-log.txt
+            echo "$timestamp: ### Started new maintainer execution ###" >> $maintainerPath/maintainer-log.txt
+            echo "Script started by user: $username" >> $maintainerPath/maintainer-log.txt
+            echo "Script was started with following Args: ${allArgs[*]}" >> $maintainerPath/maintainer-log.txt
             realExit=false
-            run=false
+        fi
+
+        # Session managment
+        if [ ${exitOnEnd:+1} ] && [[ "${exitOnEnd}" == "true" ]] && [[ "${newExecution}" == "true" ]]; then
+            if ! $killedHangingSession; then
+                echo "$timestamp: exitOnEnd was set to true, checking for other sessions" >> $maintainerPath/maintainer-log.txt
+            fi
+            otherSessionsRunning=true
+            printBlankLine=false
+            while $otherSessionsRunning;
+            do
+                checkAttachedStatus
+                if $isDetached; then
+                    if $printBlankLine; then
+                        echo >> $maintainerPath/maintainer-log.txt
+                    fi
+                    otherSessionsRunning=false
+                else
+                    printBlankLine=true
+
+                    unset scriptJustStartedPossibleString
+                    scriptJustStarted="Script was started with following Args"*
+                    scriptJustStartedPossibleString=$(tail -n 1 ${maintainerPath}/maintainer-log.txt)
+                    if [ -z "$scriptJustStartedPossibleString" ]; then
+                        head -n -1 ${maintainerPath}/maintainer-log.txt > ${maintainerPath}/temp-maintainer-log.txt; mv ${maintainerPath}/temp-maintainer-log.txt ${maintainerPath}/maintainer-log.txt
+                    elif [[ $scriptJustStartedPossibleString != $scriptJustStarted ]]; then
+                        echo >> $maintainerPath/maintainer-log.txt
+                    fi
+
+                    timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
+                    echo "Another session is running, waiting 60 seconds to try again..."
+                    echo "$timestamp: Another session is running, waiting 60 seconds to try again for session: $sessionId" >> $maintainerPath/maintainer-log.txt
+                    echo >> $maintainerPath/maintainer-log.txt
+                    updateOwnerships
+                    sleep 60
+                fi
+            done
         else
-            if [ ${currentTmux:+1} ]; then
+            checkAttachedStatus
+        fi
+        updateOwnerships
+        if [[ "${newExecution}" == "true" ]]; then
+            tmux -S /var/maintainer-tmux/maintainer has-session -t maintainer 2>/dev/null
+            if [ $? != 0 ] && [ -n $currentTmux ]; then
+                if ! $killedHangingSession; then
+                    echo No maintainer sessions detected...
+                fi
+                tmux -S /var/maintainer-tmux/maintainer new-session -s maintainer -d
+                updateArgsToPassForNewExecution
+                tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
+                echo Attaching to new tmux session...
+                tmux -S /var/maintainer-tmux/maintainer attach -t maintainer
+                realExit=false
+                run=false
+            else
+                if [ ${currentTmux:+1} ]; then
+                    previousSessionId=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=> Session ID: ).{36}'`
+                    echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
+                    echo -e \\"e[044mYou are already in a maintainer tmux session!\\e[0m\\n"
+                elif ! $isDetached && ! $reEnter; then
+                    currentUser=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=Welcome )[A-z]+(?= to)|(?<=user )[A-z]+(?= \|)$'`
+                    if [[  ${username:+1} ]] && [[ "${username}" != "${currentUser}" ]]; then
+                        echo -e \\"e[041m> Cannot start maintainer as it is currently in use by \\e[044m $currentUser \\e[041m!\\e[0m\\n"
+                        anotherUserRunning=true
+                        echo "User $username has tried to run Maintainer script, however it was already in use by $currentUser" >> $maintainerPath/maintainer-log.txt
+                    fi
+                    run=false
+                else
+                    echo Re-attaching to running session...
+                    previousSessionId=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=> Session ID: ).{36}'`
+                    realExit=false
+                    run=false
+                    runningScripts=(`pgrep -u $USER maintainer.sh 2>/dev/null`)
+                    if [[ ${#runningScripts[*]} == 0 ]] &&  [ -n $currentTmux ]; then
+                        echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
+                        echo "No script running, launching maintainer script"
+                        updateArgsToPassForNewExecution
+                        tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
+                    else
+                        echo "Rejoining running script"
+                        echo "$timestamp: Rejoining running script" >> $maintainerPath/maintainer-log.txt
+                        echo -e "<< $sessionId\\n" >> $maintainerPath/maintainer-log.txt
+                    fi
+                    echo "$timestamp: Rejoining maintainer session '$previousSessionId'" >> $maintainerPath/maintainer-log.txt
+                    tmux -S /var/maintainer-tmux/maintainer attach -t maintainer 2>/dev/null
+                fi
+            fi
+        else
+            if [ ${currentTmux:+1} ] && [[ "${newExecution}" == "true" ]]; then
                 previousSessionId=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=> Session ID: ).{36}'`
                 echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
                 echo -e \\"e[044mYou are already in a maintainer tmux session!\\e[0m\\n"
-            elif ! $isDetached && ! $reEnter; then
-                currentUser=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=Welcome )[A-z]+(?= to)|(?<=user )[A-z]+(?= \|)$'`
-                if [[  ${username:+1} ]] && [[ "${username}" != "${currentUser}" ]]; then
-                    echo -e \\"e[041m> Cannot start maintainer as it is currently in use by \\e[044m $currentUser \\e[041m!\\e[0m\\n"
-                    anotherUserRunning=true
-                    echo "User $username has tried to run Maintainer script, however it was already in use by $currentUser" >> $maintainerPath/maintainer-log.txt
-                fi
-                run=false
+                echo Re-starting the script
+                echo "$timestamp: Re-starting maintainer session" >> $maintainerPath/maintainer-log.txt
+                updateArgsToPassForNewExecution
+                tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
+            fi
+        fi
+
+        if [[ "${newExecution}" == "true" ]]; then
+            argsToPass+=("newExecution=false")
+        fi
+
+        # Main - module handler
+        firstExecutionRun=true
+        while ${run}; 
+        do
+            if $demo; then 
+                printFrames true true
             else
-                echo Re-attaching to running session...
-                previousSessionId=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=> Session ID: ).{36}'`
-                realExit=false
-                run=false
-                runningScripts=(`pgrep -u $USER maintainer.sh 2>/dev/null`)
-                if [[ ${#runningScripts[*]} == 0 ]] &&  [ -n $currentTmux ]; then
-                    echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
-                    echo "No script running, launching maintainer script"
-                    updateArgsToPassForNewExecution
-                    tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
-                else
-                    echo "Rejoining running script"
-                    echo "$timestamp: Rejoining running script" >> $maintainerPath/maintainer-log.txt
-                    echo -e "<< $sessionId\\n" >> $maintainerPath/maintainer-log.txt
+                printLogoArg=false
+                if $firstExecutionRun; then
+                    printLogoArg=true
                 fi
-                echo "$timestamp: Rejoining maintainer session '$previousSessionId'" >> $maintainerPath/maintainer-log.txt
-                tmux -S /var/maintainer-tmux/maintainer attach -t maintainer 2>/dev/null
+                printFrames $printLogoArg $clearForFrames
             fi
-        fi
-    else
-        if [ ${currentTmux:+1} ] && [[ "${newExecution}" == "true" ]]; then
-            previousSessionId=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=> Session ID: ).{36}'`
-            echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
-            echo -e \\"e[044mYou are already in a maintainer tmux session!\\e[0m\\n"
-            echo Re-starting the script
-            echo "$timestamp: Re-starting maintainer session" >> $maintainerPath/maintainer-log.txt
-            updateArgsToPassForNewExecution
-            tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
-        fi
-    fi
-
-    if [[ "${newExecution}" == "true" ]]; then
-        argsToPass+=("newExecution=false")
-    fi
-
-    # Main - module handler
-    firstExecutionRun=true
-    while ${run}; 
-    do
-        resize >/dev/null
-        if $demo; then 
-            printLogoArg=true
-            clearArg=true
-            printFrames $printLogoArg $clearArg
-        else
-            printLogoArg=false
-            if $firstExecutionRun; then
-                printLogoArg=true
-            fi
-            printFrames $printLogoArg $clearForFrames
-        fi
-        windowWidth=`tput cols`
-        windowHeight=`tput lines`
-        if ! [ ${passedModule:+1} ]; then
-            linesPrinted=0
-            while [[ "$linesPrinted" -lt "18" ]];
-            do
-                echo
-                linesPrinted=$((linesPrinted + 1))
-            done
-            usernameWidth=${#username}
-            dynamicParams="$username"
-            dynamicWidth=$usernameWidth
-
-            if $firstExecutionRun; then
-                eval "printf \"\\e[044m%0.s-\" {1..$windowWidth}\\n; echo"
-                centerAndPrintStringShort="\e[044m| Welcome \e[041m $username \e[044m to \e[043;30m Server-Maintainer \e[044;37m script |"
-                centerAndPrintString "\e[044m© \e[047m\e[30mKetchup&Co.\e[044m \e[30m|\e[37m Welcome \e[041;33m $username \e[044;33m to \e[043;30m Server\e[31m-\e[30mMaintainer \e[044;37m script \e[30m|\e[37m © \e[047m\e[30mKetchup&Co."
-                eval "printf \"\\e[044m%0.s-\" {1..$windowWidth}\\n; echo"
-            else
-                eval "printf \"%0.s-\" {1..$windowWidth}\\n; echo"
-                centerAndPrintString "\e[044;37m| \e[043;30m Server\e[31m-\e[30mMaintainer \e[044;37m script \e[042;30m Restarted \e[044;37m for user \e[041;33m $username \e[044;37m |"
-            fi
-            
-            dynamicParams="$sessionId"
-            dynamicWidth=${#sessionId}
-            centerAndPrintString "\e[044m Session ID: $sessionId "; echo
-
-            echo -e \\"e[044mAdd modules to maintainer-modules folder in the script directory with name:\\e[040m\\n\\e[041mmaintainer-<menu-order-number>-<module-role>.sh\\e[0m\\n"
-        fi
-
-        if compgen -G "${maintainerModulesPath}/maintainer-*.sh" > /dev/null; then
-            cd $maintainerModulesPath
-            unset yourfilenames
-            yourfilenames=`ls ./maintainer-[0-9]*.sh`
-
-            longestModuleNameLength=15
-            for eachfile in $yourfilenames
-            do
-                chmod +x $eachfile
-                filenamenoext=${eachfile%.*}
-                niceModuleName="${filenamenoext#*-[0-9]*-}"
-                if [ ${#niceModuleName} -gt $longestModuleNameLength ]; then
-                    longestModuleNameLength=$((${#niceModuleName}+2))
-                    foundHeader="🔍 Found following modules:"
-                    foundHeaderLength=$((longestModuleNameLength+2))
-                fi
-            done
-
+            windowWidth=`tput cols`
+            windowHeight=`tput lines`
             if ! [ ${passedModule:+1} ]; then
-                if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-status.sh" > /dev/null; then
-                    actualFileName=`ls ./maintainer-[0-9]*-server-status.sh`
-                    serverStatusArgs="colour=true"
-                    if  [ ${statusTmuxName:+1} ]; then
-                        serverStatusArgs+=" tmuxName=$statusTmuxName"
-                    fi
-                    updateOwnerships
-                    if $demo; then
-                        centerAndPrintString "\e[043m Demo mode enabled, running module-example instead of $actualFileName"
-                        /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-module-example.sh
-                    else
-                        /bin/bash ${maintainerModulesPath}/${actualFileName} $serverStatusArgs
-                    fi
-                    cd $maintainerPath
-                    head -n -1 ${maintainerPath}/maintainer-log.txt > ${maintainerPath}/temp-maintainer-log.txt; mv ${maintainerPath}/temp-maintainer-log.txt ${maintainerPath}/maintainer-log.txt
-                    cd $maintainerModulesPath
-                fi
-            fi
-            if  [ ${easyMode:+1} ] && [[ "$easyMode" == "true" ]]; then # Run easyMode with default configs through selection
-                eval "printf \"\\e[042;30m%-$foundHeaderLength"s"\\e[0;37m\\n\" \"$foundHeader\""
+                usernameWidth=${#username}
+                dynamicParams="$username"
+                dynamicWidth=$usernameWidth
 
-                unset modules
-                modules=()
-                yourfilenames=`ls ./maintainer-*.sh`
+                if $firstExecutionRun; then
+                    eval "printf \"\\e[044m%0.s-\" {1..$windowWidth}\\n; echo"
+                    centerAndPrintStringShort="\e[044m| Welcome \e[041m $username \e[044m to \e[043;30m Server-Maintainer \e[044;37m script |"
+                    centerAndPrintString "\e[044m© \e[047m\e[30mKetchup&Co.\e[044m \e[30m|\e[37m Welcome \e[041;33m $username \e[044;33m to \e[043;30m Server\e[31m-\e[30mMaintainer \e[044;37m script \e[30m|\e[37m © \e[047m\e[30mKetchup&Co.\e[44m"
+                    eval "printf \"\\e[044m%0.s-\" {1..$windowWidth}\\n; echo"
+                else
+                    eval "printf \"%0.s-\" {1..$windowWidth}\\n; echo"
+                    centerAndPrintString "\e[044m© \e[047m\e[30mKetchup&Co.\e[044m \e[37m| \e[043;30m Server\e[31m-\e[30mMaintainer \e[044;37m script \e[042;30m Restarted \e[044;37m for user \e[041;33m $username \e[044;37m | © \e[047m\e[30mKetchup&Co.\e[044m"
+                fi
+                
+                dynamicParams="$sessionId"
+                dynamicWidth=${#sessionId}
+                centerAndPrintString "\e[044m Session ID: $sessionId "; echo
+
+                echo -e \\"e[044mAdd modules to maintainer-modules folder in the script directory with name:\\e[040m\\n\\e[041mmaintainer-<menu-order-number>-<module-role>.sh\\e[0m\\n"
+            fi
+
+            if compgen -G "${maintainerModulesPath}/maintainer-*.sh" > /dev/null; then
+                cd $maintainerModulesPath
+                unset yourfilenames
+                yourfilenames=`ls ./maintainer-[0-9]*.sh`
+
+                longestModuleNameLength=15
                 for eachfile in $yourfilenames
                 do
+                    chmod +x $eachfile
                     filenamenoext=${eachfile%.*}
-                    modules+=(${filenamenoext#*-[0-9]*-})
+                    niceModuleName="${filenamenoext#*-[0-9]*-}"
+                    if [ ${#niceModuleName} -gt $longestModuleNameLength ]; then
+                        longestModuleNameLength=$((${#niceModuleName}+2))
+                        foundHeader="🔍 Found following modules:"
+                        foundHeaderLength=$((longestModuleNameLength+2))
+                    fi
                 done
-                modules+=(exit)
-                
-                PS3="Select module to run:"
-                select module in ${modules[*]}
-                do
-                    case $module in
-                        "exit")
-                            run=false
-                            printFrame1 0.2
-                            break;
-                        ;;
-                        *)
-                            if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-${module}.sh" > /dev/null; then
-                                arguments="isMaintainerRun=true username=$username"
-                                
-                                timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
-                                runModule
-                                break;
-                            fi
-                        ;;
-                    esac
-                done
-            else # Use default Maintainer interface with ability to type out the module and specify Args
-                if ! [ ${passedModule:+1} ]; then
-                    eval "printf \"\\e[042;30m%-$foundHeaderLength"s"\\e[0;37m\\n\" \"$foundHeader\""
-                    moduleCenteringSpacesAmount=$(((longestModuleNameLength-15)/2))
-                    moduleCenteringSpaces=`eval "printf \"%0.s \" {1..$moduleCenteringSpacesAmount}"`
-                    remainingSpaceForArgs=$((windowWidth-longestModuleNameLength-1))
-                    argsCenteringSpacesAmount=$(((remainingSpaceForArgs-16)/2))
-                    argsCenteringSpaces=`eval "printf \"%0.s \" {1..$argsCenteringSpacesAmount}"`
-                    eval "printf \"\\e[046;30m%-$longestModuleNameLength"s"\\e[0;37m|\\e[046;30m%$remainingSpaceForArgs"s"\\e[0;37m\\n\" \"$moduleCenteringSpaces <module-name> \" \" <default args> $argsCenteringSpaces\""
 
-                    niceModuleNames=()
+                if ! [ ${passedModule:+1} ]; then
+                    if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-status.sh" > /dev/null; then
+                        actualFileName=`ls ./maintainer-[0-9]*-server-status.sh`
+                        serverStatusArgs="colour=true"
+                        if  [ ${statusTmuxName:+1} ]; then
+                            serverStatusArgs+=" tmuxName=$statusTmuxName"
+                        fi
+                        updateOwnerships
+                        if $demo; then
+                            centerAndPrintString "\e[043m Demo mode enabled, running module-example instead of $actualFileName"
+                            /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-module-example.sh
+                        else
+                            /bin/bash ${maintainerModulesPath}/${actualFileName} $serverStatusArgs
+                        fi
+                        cd $maintainerPath
+                        head -n -1 ${maintainerPath}/maintainer-log.txt > ${maintainerPath}/temp-maintainer-log.txt; mv ${maintainerPath}/temp-maintainer-log.txt ${maintainerPath}/maintainer-log.txt
+                        cd $maintainerModulesPath
+                    fi
+                fi
+                if  [ ${easyMode:+1} ] && [[ "$easyMode" == "true" ]]; then # Run easyMode with default configs through selection
+                    eval "printf \"\\e[042;30m%-$foundHeaderLength"s"\\e[0;37m\\n\" \"$foundHeader\""
+
+                    unset modules
+                    modules=()
+                    yourfilenames=`ls ./maintainer-*.sh`
                     for eachfile in $yourfilenames
                     do
                         filenamenoext=${eachfile%.*}
-                        niceModuleName="${filenamenoext#*-[0-9]*-}"
-                        niceModuleNames+=($niceModuleName)
-                        moduleArgs="`$filenamenoext.sh getArgs=true`"
-                        moduleArgsLength=$((${#moduleArgs}+2))
-                        if [ "$moduleArgsLength" -le "$remainingSpaceForArgs" ]; then
-                            eval "printf \"\\e[044m%-$longestModuleNameLength"s"\\e[0m|\\e[044m%-$remainingSpaceForArgs"s"\\e[0m\\n\" \" $niceModuleName \" ' $moduleArgs '"
-                            eval "printf \"\\e[044m%0.s-\\e[0m\" {1..$longestModuleNameLength}"
-                            printf "|"
-                            eval "printf \"\\e[044m%0.s-\\e[0m\" {1..$remainingSpaceForArgs}"
-                            echo
-                        else
-                            moduleNamePrinted=false
-                            moduleArgsToAdd=(${moduleArgs[*]})
-                            moduleArgsProcessing=true
-                            print=false
-                            linePrinted=false
-                            while ${moduleArgsProcessing};
-                            do
-                                for ((i = 0 ; i < ${#moduleArgsToAdd[*]} ; i++ ))
-                                do
-                                    moduleToAdd="${moduleArgsToAdd[$i]}"
-                                    moduleArgsToPrint=($moduleToAdd)
-                                    argsFit=true
-                                    while ${argsFit};
-                                    do
-                                        nextArgIndex=$((i+1))
-                                        nextModule=${moduleArgsToAdd[$nextArgIndex]}
-                                        moduleArgsToPrintString="${moduleArgsToPrint[*]}"
-                                        newModuleArgsToPrintString="$moduleArgsToPrintString ${nextModule}"
-                                        newModuleArgsToPrintStringLength=$((${#newModuleArgsToPrintString}+2))
-                                        if [ "$newModuleArgsToPrintStringLength" -lt "$remainingSpaceForArgs" ] && ! [[ "${nextModule}" == "" ]]; then
-                                            moduleArgsToPrint+=($nextModule)
-                                            i=$((i+1))
-                                        else
-                                            argsFit=false
-                                            print=true
-                                        fi
-                                    done
-                                    if ${print}; then
-                                        moduleArgsToPrintString="${moduleArgsToPrint[*]}"
-                                        moduleArgsToPrintStringLength=${#moduleArgsToPrintString}
+                        modules+=(${filenamenoext#*-[0-9]*-})
+                    done
+                    modules+=(exit)
+                    
+                    PS3="Select module to run:"
+                    select module in ${modules[*]}
+                    do
+                        case $module in
+                            "exit")
+                                run=false
+                                printFrame1 0.2
+                                realExit=true
+                                break;
+                            ;;
+                            *)
+                                if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-${module}.sh" > /dev/null; then
+                                    arguments="isMaintainerRun=true username=$username"
+                                    
+                                    timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
+                                    runModule
+                                    break;
+                                fi
+                            ;;
+                        esac
+                    done
+                else # Use default Maintainer interface with ability to type out the module and specify Args
+                    if ! [ ${passedModule:+1} ]; then
+                        eval "printf \"\\e[042;30m%-$foundHeaderLength"s"\\e[0;37m\\n\" \"$foundHeader\""
+                        moduleCenteringSpacesAmount=$(((longestModuleNameLength-15)/2))
+                        moduleCenteringSpaces=`eval "printf \"%0.s \" {1..$moduleCenteringSpacesAmount}"`
+                        remainingSpaceForArgs=$((windowWidth-longestModuleNameLength-1))
+                        argsCenteringSpacesAmount=$(((remainingSpaceForArgs-16)/2))
+                        argsCenteringSpaces=`eval "printf \"%0.s \" {1..$argsCenteringSpacesAmount}"`
+                        eval "printf \"\\e[046;30m%-$longestModuleNameLength"s"\\e[0;37m|\\e[046;30m%$remainingSpaceForArgs"s"\\e[0;37m\\n\" \"$moduleCenteringSpaces <module-name> \" \" <default args> $argsCenteringSpaces\""
 
-                                        multiLineArg=true
-                                        while $multiLineArg;
+                        niceModuleNames=()
+                        for eachfile in $yourfilenames
+                        do
+                            filenamenoext=${eachfile%.*}
+                            niceModuleName="${filenamenoext#*-[0-9]*-}"
+                            niceModuleNames+=($niceModuleName)
+                            moduleArgs="`$filenamenoext.sh getArgs=true`"
+                            moduleArgsLength=$((${#moduleArgs}+2))
+                            if [ "$moduleArgsLength" -le "$remainingSpaceForArgs" ]; then
+                                eval "printf \"\\e[044m%-$longestModuleNameLength"s"\\e[0m|\\e[044m%-$remainingSpaceForArgs"s"\\e[0m\\n\" \" $niceModuleName \" ' $moduleArgs '"
+                                eval "printf \"\\e[044m%0.s-\\e[0m\" {1..$longestModuleNameLength}"
+                                printf "|"
+                                eval "printf \"\\e[044m%0.s-\\e[0m\" {1..$remainingSpaceForArgs}"
+                                echo
+                            else
+                                moduleNamePrinted=false
+                                moduleArgsToAdd=(${moduleArgs[*]})
+                                moduleArgsProcessing=true
+                                print=false
+                                linePrinted=false
+                                while ${moduleArgsProcessing};
+                                do
+                                    for ((i = 0 ; i < ${#moduleArgsToAdd[*]} ; i++ ))
+                                    do
+                                        moduleToAdd="${moduleArgsToAdd[$i]}"
+                                        moduleArgsToPrint=($moduleToAdd)
+                                        argsFit=true
+                                        while ${argsFit};
                                         do
-                                            remainingSpaceForArgsWithPadding=$((remainingSpaceForArgs-2))
-                                            remainingModuleArgsToPrint=${moduleArgsToPrintString:$remainingSpaceForArgsWithPadding}
-                                            moduleArgsToPrintString=${moduleArgsToPrintString:0:$remainingSpaceForArgsWithPadding}
-                                            if [[ "${moduleNamePrinted}" == "false" ]]; then
-                                                moduleNamePrinted=true
-                                                eval "printf \"\\e[044m%-$longestModuleNameLength"s"\\e[0m|\\e[044m%-$remainingSpaceForArgs"s"\\e[0m\\n\" \" $niceModuleName \" ' $moduleArgsToPrintString '"
+                                            nextArgIndex=$((i+1))
+                                            nextModule=${moduleArgsToAdd[$nextArgIndex]}
+                                            moduleArgsToPrintString="${moduleArgsToPrint[*]}"
+                                            newModuleArgsToPrintString="$moduleArgsToPrintString ${nextModule}"
+                                            newModuleArgsToPrintStringLength=$((${#newModuleArgsToPrintString}+2))
+                                            if [ "$newModuleArgsToPrintStringLength" -lt "$remainingSpaceForArgs" ] && ! [[ "${nextModule}" == "" ]]; then
+                                                moduleArgsToPrint+=($nextModule)
+                                                i=$((i+1))
                                             else
-                                                eval "printf \"\\e[044m%-$longestModuleNameLength"s"\\e[0m|\\e[044m%-$remainingSpaceForArgs"s"\\e[0m\\n\" \"\" ' $moduleArgsToPrintString '"
-                                            fi
-                                            moduleArgsToPrintString=$remainingModuleArgsToPrint
-                                            moduleArgsToPrintStringLength=${#moduleArgsToPrintString}
-                                            if [ "$moduleArgsToPrintStringLength" -le "0" ]; then
-                                                multiLineArg=false
+                                                argsFit=false
+                                                print=true
                                             fi
                                         done
-                                    fi
-                                    moduleArgNumber=$((i+1))
-                                    if [[ "${#moduleArgsToAdd[*]}" == "${moduleArgNumber}" ]]; then
-                                        moduleArgsProcessing=false
-                                        moduleArgsToPrint=()
-                                    fi
-                                done
-                            done
-                            eval "printf \"\\e[044m%0.s-\\e[0m\" {1..$longestModuleNameLength}"
-                            printf "|"
-                            eval "printf \"\\e[044m%0.s-\\e[0m\" {1..$remainingSpaceForArgs}"
-                            echo
-                        fi
-                    done
-                    cd $maintainerPath
-                    
-                    centerAndPrintString "\e[046;30m Type 'exit' to exit the script "
-                    
-                    centerAndPrintString "\e[046;30m To execute module type it's name and optional args (e.g. module arg=test) "
-                    
-                    niceModuleNamesString=${niceModuleNames[*]}
-                    niceModuleNamesString="${niceModuleNamesString// / \\e[0m|\\e[044m }"
-                    centerAndPrintString "\e[44m\e[0m|\e[44m ${niceModuleNamesString} \e[0m|\e[44m"
-                    
-                    read moduleAndArguments
-                    moduleAndArgumentsArr=($moduleAndArguments)
-                    if [[ "$moduleAndArguments" == "exit" ]]; then
-                        run=false
-                    else
-                        module=${moduleAndArgumentsArr[0]}
-                        arguments="${argsToPass[*]} ${moduleAndArgumentsArr[*]:1}"
-                    fi
-                else
-                    module=$passedModule
-                    arguments="${argsToPass[*]}"
-                fi
-                if [[ "$moduleAndArguments" != "exit" ]]; then
-                    moduleExists=`compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-${module}.sh" 2> /dev/null`
-                    if [[ "${moduleExists}" != "" ]]; then
-                        if ! [[ "$arguments" == *"isMaintainerRun="* ]]; then
-                            arguments+=" isMaintainerRun=true"
-                        fi
-                        if ! [[ "$arguments" == *"username="* ]]; then
-                            arguments+=" username=$username"
-                        fi
+                                        if ${print}; then
+                                            moduleArgsToPrintString="${moduleArgsToPrint[*]}"
+                                            moduleArgsToPrintStringLength=${#moduleArgsToPrintString}
 
-                        timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
-                        runModule
-                    else
-                        if [ -z "$module" ]; then
-                            centerAndPrintString "\e[041m ❌ Module name is required! Nothing was executed ❌ "
+                                            multiLineArg=true
+                                            while $multiLineArg;
+                                            do
+                                                remainingSpaceForArgsWithPadding=$((remainingSpaceForArgs-2))
+                                                remainingModuleArgsToPrint=${moduleArgsToPrintString:$remainingSpaceForArgsWithPadding}
+                                                moduleArgsToPrintString=${moduleArgsToPrintString:0:$remainingSpaceForArgsWithPadding}
+                                                if [[ "${moduleNamePrinted}" == "false" ]]; then
+                                                    moduleNamePrinted=true
+                                                    eval "printf \"\\e[044m%-$longestModuleNameLength"s"\\e[0m|\\e[044m%-$remainingSpaceForArgs"s"\\e[0m\\n\" \" $niceModuleName \" ' $moduleArgsToPrintString '"
+                                                else
+                                                    eval "printf \"\\e[044m%-$longestModuleNameLength"s"\\e[0m|\\e[044m%-$remainingSpaceForArgs"s"\\e[0m\\n\" \"\" ' $moduleArgsToPrintString '"
+                                                fi
+                                                moduleArgsToPrintString=$remainingModuleArgsToPrint
+                                                moduleArgsToPrintStringLength=${#moduleArgsToPrintString}
+                                                if [ "$moduleArgsToPrintStringLength" -le "0" ]; then
+                                                    multiLineArg=false
+                                                fi
+                                            done
+                                        fi
+                                        moduleArgNumber=$((i+1))
+                                        if [[ "${#moduleArgsToAdd[*]}" == "${moduleArgNumber}" ]]; then
+                                            moduleArgsProcessing=false
+                                            moduleArgsToPrint=()
+                                        fi
+                                    done
+                                done
+                                eval "printf \"\\e[044m%0.s-\\e[0m\" {1..$longestModuleNameLength}"
+                                printf "|"
+                                eval "printf \"\\e[044m%0.s-\\e[0m\" {1..$remainingSpaceForArgs}"
+                                echo
+                            fi
+                        done
+                        cd $maintainerPath
+                        
+                        centerAndPrintString "\e[046;30m Type 'exit' to exit the script "
+                        
+                        centerAndPrintString "\e[046;30m To execute module type it's name and optional args (e.g. module arg=test) "
+                        
+                        niceModuleNamesString=${niceModuleNames[*]}
+                        niceModuleNamesString="${niceModuleNamesString// / \\e[0m|\\e[044m }"
+                        centerAndPrintString "\e[44m\e[0m|\e[44m ${niceModuleNamesString} \e[0m|\e[44m"
+                        
+                        read moduleAndArguments
+                        moduleAndArgumentsArr=($moduleAndArguments)
+                        if [[ "$moduleAndArguments" == "exit" ]]; then
+                            run=false
                         else
-                            centerAndPrintString "\e[041m ❌ No modules with name \e[044m' ${module} '\e[041m were found, check your spelling ❌ "
+                            module=${moduleAndArgumentsArr[0]}
+                            arguments="${argsToPass[*]} ${moduleAndArgumentsArr[*]:1}"
                         fi
+                    else
+                        module=$passedModule
+                        arguments="${argsToPass[*]}"
                     fi
-                    echo
+                    if [[ "$moduleAndArguments" != "exit" ]]; then
+                        moduleExists=`compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-${module}.sh" 2> /dev/null`
+                        if [[ "${moduleExists}" != "" ]]; then
+                            if ! [[ "$arguments" == *"isMaintainerRun="* ]]; then
+                                arguments+=" isMaintainerRun=true"
+                            fi
+                            if ! [[ "$arguments" == *"username="* ]]; then
+                                arguments+=" username=$username"
+                            fi
+
+                            timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
+                            runModule
+                        else
+                            if [ -z "$module" ]; then
+                                centerAndPrintString "\e[041m ❌ Module name is required! Nothing was executed ❌ "
+                            else
+                                centerAndPrintString "\e[041m ❌ No modules with name \e[044m' ${module} '\e[041m were found, check your spelling ❌ "
+                            fi
+                        fi
+                        echo
+                    fi
                 fi
+            else
+                echo -e \\"e[041mNo modules found, please add them to the script directory in following format:\\e[040m\\n\\e[041mmaintainer-<module-role>.sh\\e[0m"
             fi
-        else
-            echo -e \\"e[041mNo modules found, please add them to the script directory in following format:\\e[040m\\n\\e[041mmaintainer-<module-role>.sh\\e[0m"
-        fi
-        cd $maintainerPath
-        if $run && [ $endScriptCommand == false ]; then
-            runOtherModules
-        fi
-        firstExecutionRun=false
-    done
+            cd $maintainerPath
+            if $run && [ $endScriptCommand == false ]; then
+                runOtherModules
+            fi
+            firstExecutionRun=false
+        done
+    fi
     sleep 0.1 # To ensure all execution has finished before closing tmux
     if [ $realExit == true ] || [ $anotherUserRunning == true ]; then
         echo "$timestamp: $username has exited the script" >> $maintainerPath/maintainer-log.txt

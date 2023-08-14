@@ -25,8 +25,8 @@ fi
 source $maintainerPath/maintainer-common.sh
 
 function exampleFunction() {
-    centerAndPrintString "\e[042;30m> This is a module demo :) <\e[0m"
-    centerAndPrintString "\e[044mPassed Args were: ${allArgs[*]}\e[0m"
+    centerAndPrintString "\e[042;30m> This is a module demo :)"
+    centerAndPrintString "\e[044mPassed Args were: ${allArgs[*]}"
     success=true
 }
 
