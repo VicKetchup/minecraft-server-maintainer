@@ -220,6 +220,22 @@ function printFrames() {
 function runInstaller() {
     ./maintainer.sh module=server-installer
 }
+function getMaintainerScripts() {
+    scriptsToSearchFor=("./maintainer-common.sh" "./easyMaintainer.sh" "./maintainer.sh")
+    foundScripts=()
+    for script in "${scriptsToSearchFor[@]}"; do
+        if [ -f "$script" ]; then
+            foundScripts+=("$script")
+        fi
+    done
+    if [ ${#foundScripts[@]} -gt 1 ]; then
+        unset 'foundScripts[0]'
+    fi
+    unset availableMaintainerScripts
+    if [ ${#foundScripts[@]} -gt 0 ]; then
+        availableMaintainerScripts=$( IFS=$'\n'; echo "${foundScripts[*]}" )
+    fi
+}
 # https://stackoverflow.com/a/21189044
 function parse_yaml {
     local prefix=$2
@@ -237,29 +253,6 @@ function parse_yaml {
         }
     }'
 }
-function getMaintainerScripts() {
-    scriptsToSearchFor=("./maintainer-common.sh" "./easyMaintainer.sh" "./maintainer.sh")
-    foundScripts=()
-    for script in "${scriptsToSearchFor[@]}"; do
-        if [ -f "$script" ]; then
-            foundScripts+=("$script")
-        fi
-    done
-    if [ ${#foundScripts[@]} -gt 1 ]; then
-        unset 'foundScripts[0]'
-    fi
-    unset availableMaintainerScripts
-    if [ ${#foundScripts[@]} -gt 0 ]; then
-        availableMaintainerScripts=$( IFS=$'\n'; echo "${foundScripts[*]}" )
-    fi
-}
-
-windowWidth=`tput cols`
-hasTmux=`dpkg -l | grep "tmux" | awk '{print $2}'`
-if [[ "$hasTmux" -ne "0" ]]; then
-    sudo apt update
-    sudo apt install tmux
-fi
 
 # Obtain or create maintaner-config.yaml
 if ! [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
@@ -277,13 +270,22 @@ if ! [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
     echo "# echo \$SSH_CONNECTION" >> $maintainerPath/maintainer-config.yaml
     echo "# Then run:" >> $maintainerPath/maintainer-config.yaml
     echo "# sudo grep -F ' from <first IP in output above> port <port (second number from output above)> ' /var/log/auth.log | grep ssh" >> $maintainerPath/maintainer-config.yaml
+elif [[ "$newExecution" == "true" ]]; then
+    centerAndPrintString "\e[042m> maintainer-config.yaml found, loading..."
+    # Load yaml data
+    configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
+    # Export variables
+    while read -r line; do
+        export $line
+    done <<< "$configVars"
 fi
-# Load yaml data
-configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
-# Export variables
-while read -r line; do
-    export $line
-done <<< "$configVars"
+
+windowWidth=`tput cols`
+hasTmux=`dpkg -l | grep "tmux" | awk '{print $2}'`
+if [[ "$hasTmux" -ne "0" ]]; then
+    sudo apt update
+    sudo apt install tmux
+fi
 
 if ! [ -d "$maintainerModulesPath" ]; then
     # Download maintainer script from git and execute it if available - AI genereted
