@@ -10,6 +10,7 @@ This guide assumes you got a bare metal Ubuntu machine to run your server on.
 ## Prerequisites
 
 - Ubuntu 20.04 LTS \(Focal Fossa\)
+  - `https://ubuntu.com/about/release-cycle#ubuntu` 
 - Puttygen
   - `https://puttygen.com/download.php?val=49`
 - Pageant
