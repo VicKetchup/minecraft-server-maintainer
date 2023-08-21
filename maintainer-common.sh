@@ -184,7 +184,7 @@ function printLogo() {
     centerAndPrintString "\e[0m     \e[040m█    █\e[0m   \e[041m█             █\e[0m▄\e[44m▀▀▀▀▀▀\e[040m▄▄▄           ▀▄\e[0m"
     centerAndPrintString "\e[0m   \e[040m█    █\e[0m   \e[041m█              █\e[44m        ▀▀▀\e[040m▄▄▄▄▄▄▄▄▄▄▀\e[0m"
     centerAndPrintString "\e[0m \e[040m█    █\e[0m   \e[041m█              ▀█\e[44m    ▒▄▄▄▄▄▄▀▀▀▀▀▀█\e[0m▄"
-    centerAndPrintString "\e[0m  \e[040m█    █\e[0m    \e[041m█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒\e[44m█     ▀              █\e[0m"
+    centerAndPrintString "\e[0m  \e[040m█    █\e[0m    \e[041m█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒\e[44m█     ▀             █\e[0m"
     centerAndPrintString "\e[0m \e[040m█    ▀\e[0m▄  ▄█\e[044m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀       ▒            █\e[0m"
     centerAndPrintString "\e[0m \e[040m▀▄    ▀▀▀\e[44m▒                   ▄▄\e[0m▀\e[44m█\e[44m▒         ▒█\e[0m"
     centerAndPrintString "$footer"
@@ -271,6 +271,12 @@ if ! [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
     echo "tmuxName: $tmuxName" >> $maintainerPath/maintainer-config.yaml
     echo "jarName: $jarName" >> $maintainerPath/maintainer-config.yaml
     echo "maintainerPath: $maintainerPath" >> $maintainerPath/maintainer-config.yaml
+    
+    echo "# To get the key for Maintainer login, do the following:" >> $maintainerPath/maintainer-config.yaml
+    echo "# Run:" >> $maintainerPath/maintainer-config.yaml
+    echo "# echo \$SSH_CONNECTION" >> $maintainerPath/maintainer-config.yaml
+    echo "# Then run:" >> $maintainerPath/maintainer-config.yaml
+    echo "# sudo grep -F ' from <first IP in output above> port <port (second number from output above)> ' /var/log/auth.log | grep ssh" >> $maintainerPath/maintainer-config.yaml
 fi
 # Load yaml data
 configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
