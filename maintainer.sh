@@ -542,7 +542,7 @@ else
                             ;;
                             *)
                                 if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-${module}.sh" > /dev/null; then
-                                    arguments="isMaintainerRun=true username=$username"
+                                    arguments="isMaintainerRun=true username=$username ${argsToPass[*]}"
                                     
                                     timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
                                     runModule

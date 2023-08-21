@@ -1,7 +1,6 @@
 #!/bin/bash
 printServerInfo=true
 clearForFrames=false
-export "isMaintainerRun"="true"
 export "tmuxName"="prison"
 source maintainer-common.sh clearForFrames=$clearForFrames
 sleep 1

@@ -1,4 +1,5 @@
 #!/bin/bash
+export "isMaintainerRun"="true"
 if [ "$TERM_PROGRAM" != tmux ]; then
     resize >/dev/null
 fi
