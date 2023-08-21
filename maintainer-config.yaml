@@ -1,0 +1,18 @@
+demo: true
+clearForFrames: true
+logsize: 50
+maintainerMainUser: ubuntu
+tmuxName: server
+jarName: spigot
+maintainerPath: /home/ubuntu
+useSshUsers: false
+sshUsers:
+    Username1: THISISAKEY_THISISASECONDKEYFORTHEFIRSTUSER 
+    Username2: NULL_RESEVES_NAMES_UNTIL_SETUP
+    Username3: NULL
+    Username4: NULL
+# To get the key for Maintainer login, do the following:
+# Run:
+# echo $SSH_CONNECTION
+# Then run:
+# sudo grep -F ' from <first IP in output above> port <port (second number from output above)> ' /var/log/auth.log | grep ssh

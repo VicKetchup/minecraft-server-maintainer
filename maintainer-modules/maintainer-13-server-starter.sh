@@ -1,6 +1,6 @@
 #!/bin/bash
 success=false
-ramDefault=8
+ramDefault=16
 ramToUse=0 # is overwritten later
 numberReg='^[0-9]+$'
 maintainerExecution=false
@@ -26,7 +26,7 @@ if [ ${ram:+1} ]; then
     if ! [[ $ram =~ $numberReg ]]; then
         ramToUse=$ramDefault
         if ! $maintainerExecution; then
-            centerAndPrintString "\e[041mProvided RAM parameter is not a number, using default value: \e[044m$ramToUse\e[0m\n"
+            centerAndPrintString "\e[041mProvided RAM parameter is not a number, using default value: \e[044m$ramToUse"
         fi
     fi
 else
@@ -68,15 +68,17 @@ else
     tmux -S /var/$tmuxName-tmux/$tmuxName has-session -t $tmuxName 2>/dev/null
     if [ $? != 0 ]; then
         if compgen -G "${path}/${jarName}.jar" > /dev/null; then
-            centerAndPrintString "\e[042;30mStarting \e[0m\e[044m ${jarName}.jar \e[042;30m in \e[0m\e[044m $path \e[042;30m with \e[0m\e[044m ${ramToUse}GB \e[042;30m of RAM in tmux session \e[0m\e[044m ${tmuxName} \e[042;30m...\e[0m"
+            centerAndPrintString "\e[042;30mStarting \e[0m\e[044m ${jarName}.jar \e[042;30m in \e[0m\e[044m $path \e[042;30m with \e[0m\e[044m ${ramToUse}GB \e[042;30m of RAM in tmux session \e[0m\e[044m ${tmuxName} \e[042;30m..."
             if ! $maintainerExecution; then
-                centerAndPrintString "\e[044m> You can change these parameters by executing the script with jarName, path and ram parameters\e[0m\n"
+                centerAndPrintString "\e[044m> You can change these parameters by executing the script with jarName, path and ram parameters"
             fi
             echo
             startJar
+        else
+            centerAndPrintString "\e[041m Cannot start server as \e[0m\e[044m ${jarName}.jar \e[041m does not exist in \e[0m\e[044m $path \e[0m\e[041m..."
         fi
     else
-        centerAndPrintString "\e[041m Cannot start server as a tmux session with name \e[0m\e[044m $tmuxName \e[0m\e[041m alraedy exists...\e[0m\n"
+        centerAndPrintString "\e[041m Cannot start server as a tmux session with name \e[0m\e[044m $tmuxName \e[0m\e[041m alraedy exists..."
     fi
     # Log results
     if [ ${isMaintainerRun:+1} ] && [[ "${isMaintainerRun}" == "true" ]]; then

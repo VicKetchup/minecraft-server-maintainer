@@ -1,6 +1,9 @@
 #!/bin/bash
+export "isMaintainerRun"="true"
+# Default arguments
 defaultMaintainerPath=/home/ubuntu
 
+# Get passed arguments
 for ARGUMENT in "$@"
 do
     KEY=$(echo $ARGUMENT | cut -f1 -d=)
@@ -8,11 +11,13 @@ do
     KEY_LENGTH=${#KEY}
     VALUE="${ARGUMENT:$KEY_LENGTH+1}"
 
+    argsToPass+=("$KEY"="$VALUE")
+
     export "$KEY"="$VALUE"
 done
-
 if ! [ ${maintainerPath:+1} ]; then
     maintainerPath=$defaultMaintainerPath
+    export "maintainerPath"="$defaultMaintainerPath"
 fi
 
 if [ ${getArgs:+1} ]; then
@@ -23,5 +28,8 @@ if [ ${getArgs:+1} ]; then
     fi
 else
     # Code
-    /bin/bash ${maintainerPath}/maintainer.sh easyMode=true isMaintainerRun=true
+    source $maintainerPath/maintainer-common.sh
+    
+    cd $maintainerPath
+    /bin/bash ${maintainerPath}/maintainer.sh easyMode=true isMaintainerRun=true ${argsToPass[*]}
 fi

@@ -28,7 +28,7 @@ fi
 source $maintainerPath/maintainer-common.sh
 
 function getCommandFromUser {
-    centerAndPrintString "\e[042;30m> Please enter command to run <\e[0m"
+    centerAndPrintString "\e[042;30m> Please enter command to run <"
     read command
     if [[ "${command}" == "" ]]; then
         unset command
@@ -38,7 +38,7 @@ function getCommandFromUser {
 function executeCommand {
     sudo tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "helpop executing command '${command}' by user ${username} from maintainer"  ENTER
     sudo tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "${command}"  ENTER
-    centerAndPrintString "\e[042;30m> Command executed :) <\e[0;37m"
+    centerAndPrintString "\e[042;30m> Command executed :) <"
     success=true
 }
 
@@ -61,7 +61,7 @@ else
             executeCommand
         else
             sudo tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "helpop Maintainer module 'server-run-command' executed with no command by user ${username}"  ENTER
-            centerAndPrintString "\e[041m> Please provide command to run <\e[0m\n"
+            centerAndPrintString "\e[041m> Please provide command to run <"
         fi
     fi
     # Log results

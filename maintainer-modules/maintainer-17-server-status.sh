@@ -50,7 +50,7 @@ else
 
     isTmuxRunning=false
     tmuxStatusString="None running"
-    sudo tmux -S /var/$tmuxName-tmux/$tmuxName has-session -t $tmuxName
+    sudo tmux -S /var/$tmuxName-tmux/$tmuxName has-session -t $tmuxName > /dev/null 2>&1
     if [ $? == 0 ]; then
         isTmuxRunning=true
         tmuxStatusString=$tmuxName
@@ -67,7 +67,10 @@ else
     fi
     
     unset conditionalInfo
-    storageTakenUpByServer=$(du -sh "${maintainerPath}/${serverFolder}" | awk '{print $1}')
+    storageTakenUpByServer="0"
+    if compgen -G "${maintainerPath}/${serverFolder}" > /dev/null; then
+        storageTakenUpByServer=$(du -sh "${maintainerPath}/${serverFolder}" | awk '{print $1}')
+    fi
     infoString="tmux=$isTmuxRunning ($tmuxName) | server-running=$isServerRunning | storage-usage=$storageTakenUpByServer"
     if $isServerRunning; then
         systemColor="\e[42;30m"

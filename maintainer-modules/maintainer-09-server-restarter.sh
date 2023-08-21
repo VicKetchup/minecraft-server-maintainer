@@ -31,14 +31,14 @@ maintainerModulesPath=$maintainerPath/maintainer-modules
 source $maintainerPath/maintainer-common.sh
 
 function confirmation() {
-    centerAndPrintString "\e[041mAre you sure about this? [y/n]\e[0m"
+    centerAndPrintString "\e[041mAre you sure about this? [y/n]"
     read runstring
     if [[ "${runstring,,}" == "y" ]]; then
         run=true
     elif [[ "${runstring,,}" == "n" ]]; then
         run=false
     else
-        centerAndPrintString "\e[041mInvalid input, please type 'y' or 'n'\e[0m"
+        centerAndPrintString "\e[041mInvalid input, please type 'y' or 'n'"
         confirmation
     fi
     echo
@@ -52,7 +52,7 @@ function backup() {
             fi
         fi
     else
-        centerAndPrintString "\e[41m> Cannot backup the server as the module \e[044m server-backuper \e[041m is missing!\e[0m"
+        centerAndPrintString "\e[41m> Cannot backup the server as the module \e[044m server-backuper \e[041m is missing!"
     fi
     return $backedUp
 }
@@ -72,7 +72,7 @@ function restart() {
                 success=true
             fi
         else
-            centerAndPrintString "\e[41m> Cannot stop the server as the module \e[044m server-stopper \e[041m is missing!\e[0m"
+            centerAndPrintString "\e[41m> Cannot stop the server as the module \e[044m server-stopper \e[041m is missing!"
         fi
     else
         if start; then
@@ -87,18 +87,18 @@ function start() {
             started=0
         fi
     else
-        centerAndPrintString "\e[41m> Couldn't start the server as module\e[044m server-starter \e[041m is missing!\e[0m"
+        centerAndPrintString "\e[41m> Couldn't start the server as module\e[044m server-starter \e[041m is missing!"
     fi
     return $started
 }
 function stop() {
     stopped=1
     if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-stopper.sh" > /dev/null; then
-        if /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-stopper.sh skipSuccessLog=true; then
+        if /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-stopper.sh action=restarting skipSuccessLog=true; then
             stopped=0
         fi
     else
-        centerAndPrintString "\e[41m> Cannot stop the server as the module \e[044m server-stopper \e[041m is missing!\e[0m"
+        centerAndPrintString "\e[41m> Cannot stop the server as the module \e[044m server-stopper \e[041m is missing!"
     fi
     return $stopped
 }

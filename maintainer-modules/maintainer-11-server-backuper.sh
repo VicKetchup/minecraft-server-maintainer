@@ -1,18 +1,16 @@
 #!/bin/bash
-success=false
+# Default arguments
+timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
+defaultMode=root # allowed values: local, root
 defaultTmuxName=server
 defaultServerFolder=server
 defaultServerStop='false'
 defaultServerRestart='true'
-defaultMode=root # allowed values: local, root
-defaultBackupPath="/backups"
-path=`pwd`
+defaultRelativeBackupPath="/backups"
+defaultBackupFileName="backup-$timestamp"
 defaultMaintainerPath=/home/ubuntu
 
-if [[ "$path" == "\\" ]]; then
-    path=""
-fi
-
+# Get passed arguments
 for ARGUMENT in "$@"
 do
     KEY=$(echo $ARGUMENT | cut -f1 -d=)
@@ -23,17 +21,26 @@ do
     export "$KEY"="$VALUE"
 done
 
+if ! [ ${mode:+1} ]; then
+    mode=$defaultMode
+fi
+if ! [ ${tmuxName:+1} ]; then
+    tmuxName=$defaultTmuxName
+fi
+if ! [ ${serverFolder:+1} ]; then
+    serverFolder=$defaultServerFolder
+fi
 if ! [ ${serverStop:+1} ]; then
     serverStop=$defaultServerStop
 fi
 if ! [ ${serverRestart:+1} ]; then
     serverRestart=$defaultServerRestart
 fi
-if ! [ ${mode:+1} ]; then
-    mode=$defaultMode
+if ! [ ${relativeBackupPath:+1} ]; then
+    relativeBackupPath=$defaultRelativeBackupPath
 fi
-if ! [ ${serverFolder:+1} ]; then
-    serverFolder=$defaultServerFolder
+if ! [ ${backupFileName:+1} ]; then
+    backupFileName=$defaultBackupFileName
 fi
 if ! [ ${maintainerPath:+1} ]; then
     maintainerPath=$defaultMaintainerPath
@@ -45,36 +52,41 @@ source $maintainerPath/maintainer-common.sh
 
 function backup() {
     if [ ! -d $backupPath ]; then
-        cd $path
-        centerAndPrintString "\e[043;30m> Creating backups folder \e[0m\e[044m ${backupPath} \e[043;30m...\e[0m"
-        if [[ "$backupPath" == "$defaultBackupPath" ]]; then
-            sudo mkdir backups
+        centerAndPrintString "\e[043;30mCreating backups folder \e[0m\e[044m ${backupPath} \e[043;30m..."
+        if [[ "$mode" == "root" ]]; then
+            sudo mkdir $backupPath
         else
-            mkdir backups
+            mkdir $backupPath
         fi
     fi
-    centerAndPrintString "\e[043;30m> Backing up server to \e[0m\e[044m $backupFile \e[043;30m...\e[0m"
+    centerAndPrintString "\e[043;30mBacking up server to \e[0m\e[044m $backupFile \e[043;30m..."
 
-    if [[ "$backupPath" == "$defaultBackupPath" ]]; then
-        sudo zip -r $backupFile $maintainerPath/$serverFolder
+    if [[ "$mode" == "root" ]]; then
+        (cd $maintainerPath/$serverFolder && sudo zip -r $backupFile *)
     else
-        zip -r $backupFile $maintainerPath/$serverFolder
+        (cd $maintainerPath/$serverFolder && zip -r $backupFile *)
     fi
-    centerAndPrintString "\e[042;30m> Backup has been completed! File created: \e[0m\e[044m $backupFile \e[0m\n"
-    success=true
+    if compgen -G "${backupFile}" > /dev/null; then
+        centerAndPrintString "\e[042;30mBackup has been completed! File created: \e[0m\e[044m $backupFile \e[042;30m..."
+        success=true
+    fi
 }
 
 if [ ${getArgs:+1} ]; then
     if [[ "$getArgs" == "true" ]]; then
-        echo "mode=$defaultMode tmuxName=$defaultTmuxName serverFolder=$defaultServerFolder serverStop=$defaultServerStop serverRestart=$defaultServerRestart maintainerPath=$defaultMaintainerPath"
+        echo "mode=$defaultMode tmuxName=$defaultTmuxName serverFolder=$defaultServerFolder serverStop=$defaultServerStop serverRestart=$defaultServerRestart relativeBackupPath=$defaultRelativeBackupPath maintainerPath=$defaultMaintainerPath"
     else
         echo -e \\"e[041mBad value provided for parameter \\e[044mgetArgs\\e[041m!\\e[0m"
     fi
 else
     # Code
-    if ! [ ${tmuxName:+1} ]; then
-        tmuxName=$defaultTmuxName
+    success=false
+    if [[ "$mode" == "local" ]]; then
+        backupPath="$maintainerPath/$relativeBackupPath"
+    elif [[ "$mode" == "root" ]]; then
+        backupPath=$relativeBackupPath
     fi
+    backupFile="${backupPath}/$backupFileName.zip"
 
     pid=$(pgrep -u ubuntu java 2>/dev/null)
     numberReg='^[0-9]+$'
@@ -85,28 +97,21 @@ else
             isServerRunning=false
         fi
     fi
-
-    if [[ "$mode" == "local" ]]; then
-        backupPath="${path}/backups"
-    elif [[ "$mode" == "root" ]]; then
-        backupPath=$defaultBackupPath
-    fi
-    timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
-    backupFile="${backupPath}/backup-$timestamp.zip"
+    
     if $isServerRunning; then
         if [[ "$serverStop" == "true" ]]; then
             if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-stopper.sh" > /dev/null; then
-                /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-stopper.sh skipSuccessLog=true isMaintainerRun=true
+                /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-stopper.sh action=restarting skipSuccessLog=true isMaintainerRun=true
                 backup
                 if [[ "${serverRestart}" == "true" ]]; then
                     if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-starter.sh" > /dev/null; then
-                        /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-starter.sh skipSuccessLog=true
+                        /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-starter.sh skipSuccessLog=true isMaintainerRun=true
                     else
-                        centerAndPrintString "\e[41m> Couldn't start the server as module\e[044m server-starter \e[041m is missing!\e[0m"
+                        centerAndPrintString "\e[41m> Couldn't start the server as module \e[044m server-starter \e[041m is missing!"
                     fi
                 fi
             else
-                centerAndPrintString "\e[41m> Cannot stop the server as the module \e[044m server-stopper \e[041m is missing!\e[0m"
+                centerAndPrintString "\e[41m> Cannot stop the server as the module \e[044m server-stopper \e[041m is missing!"
             fi
         else
             sudo tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 save-off ENTER

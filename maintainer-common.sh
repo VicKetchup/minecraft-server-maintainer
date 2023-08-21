@@ -1,12 +1,38 @@
 #!/bin/bash
-defaultJarName=spigot
-defaultTmuxName=server
-defaultMaintainerPath=/home/ubuntu
-defaultPath=$defaultMaintainerPath/server
-maintainerMainUser=ubuntu
 if [ "$TERM_PROGRAM" != tmux ]; then
     resize >/dev/null
 fi
+
+defaultDemo=true
+defaultClearForFrames=true
+defaultLogSize=50
+defaultMaintainerMainUser=ubuntu
+defaultTmuxName=server
+defaultJarName=spigot
+defaultMaintainerPath=/home/ubuntu
+
+if ! [ ${demo:+1} ]; then
+    demo=$defaultDemo
+fi
+if ! [ ${clearForFrames:+1} ]; then
+    clearForFrames=$defaultClearForFrames
+fi
+if ! [ ${tmuxName:+1} ]; then
+    tmuxName=$defaultTmuxName
+fi
+if ! [ ${jarName:+1} ]; then
+    jarName=$defaultJarName
+fi
+if ! [ ${maintainerMainUser:+1} ]; then
+    maintainerMainUser=$defaultMaintainerMainUser
+fi
+if ! [ ${maintainerPath:+1} ]; then
+    maintainerPath=$defaultMaintainerPath
+fi
+maintainerModulesPath=$maintainerPath/maintainer-modules
+
+footer=" \e[0m© \e[40;33mProduct of \e[31mVicKetchup\e[33m of \e[31mKetchup \e[37m& \e[31mCo\e[37m.\e[33m Please respect the copyright \e[0m© "
+
 function getVisibleLength() {
     local string="$1"
     # echo "getVisibleLength: input string: $string" >&2
@@ -21,7 +47,6 @@ function getVisibleLength() {
     # echo "getVisibleLength: visible length: $visibleLength" >&2
     echo "$visibleLength"
 }
-
 # Function to center and print a given string with a blue background
 function centerAndPrintString() {
     # Check if a shorter string was provided for use in case of a very slim window
@@ -87,9 +112,6 @@ function centerAndPrintString() {
     unset leftEdgeSymbols
     unset rightEdgeSymbols
 }
-
-footer=" \e[0m© \e[40;33mProduct of \e[31mVicKetchup\e[33m of \e[31mKetchup \e[37m& \e[31mCo\e[37m.\e[33m Please respect the copyright \e[0m© "
-
 function printFrame1() {
     echo
     centerAndPrintString "\e[0m \e[41m              \e[030m⛏  \e[033mServer\e[30m-\e[033mMaintainer \e[030m⛏             \e[0m "
@@ -116,7 +138,6 @@ function printFrame1() {
     centerAndPrintString "$footer"
     sleep $1;
 }
-
 function printFrame0() {
     echo
     echo
@@ -143,7 +164,6 @@ function printFrame0() {
     sleep $1;
     clear
 }
-
 function printLogo() {
     centerAndPrintString "\e[0m               ▄█▀▀▀▀▀▀█▄█\e[047m▀▒▒▒▒▒▒▒▒▀\e[0m█▄▄\e[0m"
     centerAndPrintString "\e[0m                 \e[040m█         █\e[047m▒▒▒\e[0m         ▀██▀\e[0m"
@@ -170,12 +190,11 @@ function printLogo() {
     centerAndPrintString "$footer"
     sleep $1;
 }
-
 function printFrames() {
     if $1; then
         leftEdgeSymbols=" \e[30m|\e[31m ⚠ \e[30m |"
         rightEdgeSymbols="\e[30m |\e[31m ⚠ \e[30m |"
-        centerAndPrintString "\e[43m\e[30m | \e[37m⛏  \e[30mServer\e[31m-\e[30mMaintainer \e[31mis \e[30mLoading...\e[30m |"
+        centerAndPrintString "\e[43m\e[30m | \e[37m⛏  \e[30mServer\e[31m-\e[30mMaintainer \e[31mis \e[30mLoading\e[31m...\e[30m |"
     fi
     if $demo; then
         if $1; then
@@ -198,24 +217,42 @@ function printFrames() {
         clear; 
     fi
 }
-
 function runInstaller() {
     ./maintainer.sh module=server-installer
 }
-
-if ! [ ${jarName:+1} ]; then
-    jarName=$defaultJarName
-fi
-if ! [ ${tmuxName:+1} ]; then
-    tmuxName=$defaultTmuxName
-fi
-if ! [ ${path:+1} ]; then
-    path=$defaultPath
-fi
-if ! [ ${maintainerPath:+1} ]; then
-    maintainerPath=$defaultMaintainerPath
-fi
-maintainerModulesPath=$maintainerPath/maintainer-modules
+# https://stackoverflow.com/a/21189044
+function parse_yaml {
+    local prefix=$2
+    local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+    sed -ne "s|^\($s\):|\1|" \
+        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+    awk -F$fs '{
+        indent = length($1)/2;
+        vname[indent] = $2;
+        for (i in vname) {if (i > indent) {delete vname[i]}}
+        if (length($3) > 0) {
+            vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+            printf("%s%s%s=%s\n", "'$prefix'",vn, $2, $3);
+        }
+    }'
+}
+function getMaintainerScripts() {
+    scriptsToSearchFor=("./maintainer-common.sh" "./easyMaintainer.sh" "./maintainer.sh")
+    foundScripts=()
+    for script in "${scriptsToSearchFor[@]}"; do
+        if [ -f "$script" ]; then
+            foundScripts+=("$script")
+        fi
+    done
+    if [ ${#foundScripts[@]} -gt 1 ]; then
+        unset 'foundScripts[0]'
+    fi
+    unset availableMaintainerScripts
+    if [ ${#foundScripts[@]} -gt 0 ]; then
+        availableMaintainerScripts=$( IFS=$'\n'; echo "${foundScripts[*]}" )
+    fi
+}
 
 windowWidth=`tput cols`
 hasTmux=`dpkg -l | grep "tmux" | awk '{print $2}'`
@@ -224,8 +261,25 @@ if [[ "$hasTmux" -ne "0" ]]; then
     sudo apt install tmux
 fi
 
+# Obtain or create maintaner-config.yaml
+if ! [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
+    centerAndPrintString "\e[041m> maintainer-config.yaml not found, creating one..."
+    echo "demo: $demo" >> $maintainerPath/maintainer-config.yaml
+    echo "clearForFrames: $clearForFrames" >> $maintainerPath/maintainer-config.yaml
+    echo "logsize: $logsize" >> $maintainerPath/maintainer-config.yaml
+    echo "maintainerMainUser: $maintainerMainUser" >> $maintainerPath/maintainer-config.yaml
+    echo "tmuxName: $tmuxName" >> $maintainerPath/maintainer-config.yaml
+    echo "jarName: $jarName" >> $maintainerPath/maintainer-config.yaml
+    echo "maintainerPath: $maintainerPath" >> $maintainerPath/maintainer-config.yaml
+fi
+# Load yaml data
+configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
+# Export variables
+while read -r line; do
+    export $line
+done <<< "$configVars"
+
 if ! [ -d "$maintainerModulesPath" ]; then
-    # TODO: Download maintainer from git and execute wtih server-installer module if it is available, if not, download it from the maintainer-modules folder in the repository and execute it, place holder git URL = <git-url>, execute using ssh
     # Download maintainer script from git and execute it if available - AI genereted
     if git clone https://github.com/VicKetchup/minecraft-server-maintainer minecraft-server-maintainer; then
         centerAndPrintString "\e[43;30mGit clone successful. Executing the maintainer script..."
@@ -239,5 +293,18 @@ if ! [ -d "$maintainerModulesPath" ]; then
         else
             echo "\e[41mDownload failed. The maintainer script is not available."
         fi
+    fi
+fi
+
+if [ "$TERM_PROGRAM" != tmux ] && ! [[ $isMaintainerRun ]]; then
+    getMaintainerScripts
+    if [ -n "$availableMaintainerScripts" ]; then
+        leftEdgeSymbols="\033[41;33m ⛑  \033[47;30m > \033[46m"
+        rightEdgeSymbols="\033[47m < \033[41;33m ⛑  "
+        centerAndPrintString "\e[46;30m Found Maintainer scripts, following executions are available:"
+        while read -r line; do
+            centerAndPrintString "\e[44;37m $line"
+        done <<< "$availableMaintainerScripts"
+        centerAndPrintString "\e[46;30m Copy-Paste or Type to run :)"
     fi
 fi

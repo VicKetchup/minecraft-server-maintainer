@@ -1,22 +1,16 @@
 #!/bin/bash
-resize >/dev/null
 # Default arguments
-demo=true
-logSize=50
-clearForFrames=true
 run=true
-defaultUsername=$USER
-timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
-defaultIsMaintainerRun="false"
+newExecution="true"
 realExit=true
 anotherUserRunning=false
-defaultNewExecution="true"
 endScriptCommand=false
 updateTmuxOwnership=false
-defaultMaintainerPath=/home/ubuntu
-defaultPath=$defaultMaintainerPath/server
-defaultJarName=spigot
-maintainerMainUser=ubuntu
+defaultUsername=$USER
+defaultIsMaintainerRun="false"
+defaultModuleArg=true
+defaultModuleArg2=false
+timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
 
 # Get passed arguments
 for ARGUMENT in "$@"
@@ -38,26 +32,21 @@ do
     export "$KEY"="$VALUE"
 done
 
-if ! [ ${maintainerPath:+1} ]; then
-    maintainerPath=$defaultMaintainerPath
-fi
-maintainerModulesPath=$maintainerPath/maintainer-modules
 if ! [ ${isMaintainerRun:+1} ]; then
     isMaintainerRun=$defaultIsMaintainerRun
 fi
-if ! [ ${newExecution:+1} ]; then
-    newExecution=$defaultNewExecution
+if ! [ ${modulearg:+1} ]; then
+    modulearg=$defaultModuleArg
 fi
-if ! [ ${jarName:+1} ]; then
-    jarName=$defaultJarName
-    allArgs+=("jarName"="$jarName")
-    argsToPass+=("jarName"="$jarName")
+if ! [ ${modulearg2:+1} ]; then
+    modulearg2=$defaultModuleArg2
 fi
+maintainerModulesPath=$maintainerPath/maintainer-modules
 
 # Functions
 function runOtherModules() {
     unset passedModule
-    echo Do you need to run other modules? [y/n]:
+    centerAndPrintString "\e[43;30mDo you need to run other modules? [y/n]:"
     read runstring
     if [[ "${runstring,,}" == "n" ]]; then
         run=false
@@ -129,7 +118,9 @@ function login() {
                 login
             fi
         else
-            username=$defaultUsername
+            if [[ -n $username ]]; then
+                username=$defaultUsername
+            fi
         fi
     fi
 }
@@ -261,12 +252,12 @@ function cleanUpLogs() {
         mv ${maintainerPath}/temp-maintainer-log.txt ${maintainerPath}/maintainer-log.txt
     fi
 }
-
+# Ensure user can't exit script without proper exit
 trap 'echo; centerAndPrintString "\e[41m ⛔ Please exit the script properly ⛔ "' 2 15 20
 
 if [ ${getArgs:+1} ]; then # If getArgs is passed, print out default arguments
     if [[ "$getArgs" == "true" ]]; then
-        echo "username=$defaultUsername maintainerPath=$defaultMaintainerPath statusTmuxName=prison easyMode=false module=module-example modulearg=true modulearg2=false"
+        echo "username=$defaultUsername maintainerPath=$defaultMaintainerPath tmuxName=$defaultTmuxName easyMode=false module=module-example modulearg=true modulearg2=false"
     else
         echo -e \\"e[041mBad value provided for parameter \\e[044mgetArgs\\e[041m!\\e[0m"
     fi
@@ -291,9 +282,16 @@ else
             getUser=true
         fi
         unset usernames
-        if compgen -G "${maintainerPath}/maintainer-usernames.txt" > /dev/null; then
-            read -r usernamesfirstline<"${maintainerPath}/maintainer-usernames.txt"
-            usernames=($usernamesfirstline)
+        if $useSshUsers; then
+            # Get User Data
+            while read -r line; do
+                if [[ "$line" == *"sshUsers__"* ]]; then
+                    userData=${line#*sshUsers__}
+                    IFS="=" read -r -a userDataArray <<< "$userData"
+                    usernames+=(${userDataArray[0]})
+                    shas+=(${userDataArray[1]})
+                fi
+            done <<< "$configVars"
             usernames+=("Free-type")
         fi
         unset connectionsha
@@ -301,13 +299,14 @@ else
         if [[ "$currentsshconnection" != "" ]]; then
             connectioninfo=`sudo grep -F " from ${currentsshconnection[0]} port ${currentsshconnection[1]} " /var/log/auth.log | grep ssh | tail -n 1`
             connectionsha=${connectioninfo#*SHA256:}
-            shas=(`sed -n '2p;' ${maintainerPath}/maintainer-usernames.txt`)
         fi
         if [ ${connectionsha:+1} ]; then
             login
         else
-            echo -e \\"e[041m> Issue getting current connection, please restart your client or Free-Type your username\\e[0m\\n"
-            freeTypeUsername
+            centerAndPrintString "\e[041m> Issue getting current connection, please restart your client or Free-Type your username"
+            if $getUser; then
+                freeTypeUsername
+            fi
         fi
     fi
 
@@ -378,7 +377,7 @@ else
                 fi
                 tmux -S /var/maintainer-tmux/maintainer new-session -s maintainer -d
                 updateArgsToPassForNewExecution
-                tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
+                tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh newExecution=$newExecution ${argsToPass[*]}" ENTER
                 echo Attaching to new tmux session...
                 tmux -S /var/maintainer-tmux/maintainer attach -t maintainer
                 realExit=false
@@ -386,8 +385,12 @@ else
             else
                 if [ ${currentTmux:+1} ]; then
                     previousSessionId=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=> Session ID: ).{36}'`
-                    echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
-                    echo -e \\"e[044mYou are already in a maintainer tmux session!\\e[0m\\n"
+                    if [[ "$previousSessionId" == "$sessionId" ]]; then
+                        echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
+                        centerAndPrintString "\e[044mYou are already in a maintainer tmux session: \e[046;30m$previousSessionId \e[044;37m!"
+                    else
+                        centerAndPrintString "\e[042;30mNew Session Launched :)"
+                    fi
                 elif ! $isDetached && ! $reEnter; then
                     currentUser=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=Welcome )[A-z]+(?= to)|(?<=user )[A-z]+(?= \|)$'`
                     if [[  ${username:+1} ]] && [[ "${username}" != "${currentUser}" ]]; then
@@ -437,6 +440,8 @@ else
         while ${run}; 
         do
             if $demo; then 
+                printLogoArg=true
+                clearArg=true
                 printFrames true true
             else
                 printLogoArg=false
@@ -448,6 +453,12 @@ else
             windowWidth=`tput cols`
             windowHeight=`tput lines`
             if ! [ ${passedModule:+1} ]; then
+                linesPrinted=0
+                while [[ "$linesPrinted" -lt "$windowHeight" ]];
+                do
+                    # echo - TODO: Not sure if this is needed
+                    linesPrinted=$((linesPrinted + 1))
+                done
                 usernameWidth=${#username}
                 dynamicParams="$username"
                 dynamicWidth=$usernameWidth
@@ -491,8 +502,8 @@ else
                     if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-status.sh" > /dev/null; then
                         actualFileName=`ls ./maintainer-[0-9]*-server-status.sh`
                         serverStatusArgs="colour=true"
-                        if  [ ${statusTmuxName:+1} ]; then
-                            serverStatusArgs+=" tmuxName=$statusTmuxName"
+                        if  [ ${tmuxName:+1} ]; then
+                            serverStatusArgs+=" tmuxName=$tmuxName"
                         fi
                         updateOwnerships
                         if $demo; then

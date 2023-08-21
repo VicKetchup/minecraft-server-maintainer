@@ -1,9 +1,0 @@
-Username1 Username2 Username3 Username4
-THISISAKEY_THISISASECONDKEYFORTHEFIRSTUSER NULL_RESEVES_NAMES_UNTIL_SETUP NULL NULL
-# First line of the file should have space separated usernames
-# Second line should have space separated keys in order of usernames (Multiple keys can be used, to allow muyltiple devices, by separating them with "_")
-# To get the key for Maintainer login, do the following:
-# Run:
-# echo $SSH_CONNECTION
-# Then run:
-# sudo grep -F ' from <first IP in output above> port <port (second number from output above)> ' /var/log/auth.log | grep ssh

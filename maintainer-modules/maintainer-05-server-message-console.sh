@@ -28,7 +28,7 @@ fi
 source $maintainerPath/maintainer-common.sh
 
 function getMessageFromUser {
-    centerAndPrintString "\e[042;30m> Please enter your message: <\e[0m"
+    centerAndPrintString "\e[042;30m> Please enter your message: <"
     read message
     if [[ "${message}" == "" ]]; then
         unset message
@@ -38,7 +38,7 @@ function getMessageFromUser {
 function sendMessage {
     sudo tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "helpop Maintainer message module executed by user ${username}" ENTER
     sudo tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "bc $username: ${format}${message}" ENTER
-    centerAndPrintString "\e[042;30m> Message Broadcasted :) <\e[0;37m"
+    centerAndPrintString "\e[042;30m> Message Broadcasted :) <"
     success=true
 }
 
@@ -61,7 +61,7 @@ else
             sendMessage
         else
             sudo tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "helpop Maintainer module 'server-message-console' executed with no message by user ${username}"  ENTER
-            centerAndPrintString "\e[041m> Please provide message to broadcast it to the server <\e[0m\n"
+            centerAndPrintString "\e[041m> Please provide message to broadcast it to the server <"
         fi
     fi
     # Log results

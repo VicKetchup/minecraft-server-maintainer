@@ -32,16 +32,16 @@ source $maintainerPath/maintainer-common.sh
 
 function confirmation() {
     if [ ${extramessage:+1} ]; then
-        centerAndPrintString "\e[041m$extramessage\e[0m"
+        centerAndPrintString "\e[041m$extramessage"
     fi
-    centerAndPrintString "\e[041mAre you sure about this? [y/n]\e[0m"
+    centerAndPrintString "\e[041mAre you sure about this? [y/n]"
     read runstring
     if [[ "${runstring,,}" == "y" ]]; then
         run=true
     elif [[ "${runstring,,}" == "n" ]]; then
         run=false
     else
-        centerAndPrintString "\e[041mInvalid input, please type 'y' or 'n'\e[0m"
+        centerAndPrintString "\e[041mInvalid input, please type 'y' or 'n'"
         confirmation
     fi
     echo
@@ -94,12 +94,20 @@ else
                         unset extramessage
                         if $run; then
                             reboot
+                        else
+                            centerAndPrintString "\e[42;30mReboot cancelled as Java session is still running on \e[044m $pid \e[42;30m"
                         fi
+                    else
+                        reboot
                     fi
+                else
+                    centerAndPrintString "\e[42;30mReboot cancelled as Tmux session \e[44;37m $tmuxName \e[42;30m is still running"
                 fi
             else
                 reboot
             fi
+        else
+            centerAndPrintString "\e[42;30mReboot cancelled by user"
         fi
     else
         reboot

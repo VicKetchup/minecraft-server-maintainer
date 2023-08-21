@@ -23,14 +23,18 @@ maintainerModulesPath=$maintainerPath/maintainer-modules
 source $maintainerPath/maintainer-common.sh
 
 function enterConsole() {
-    centerAndPrintString "\e[044mTo exit console hold \e[046;30m Ctrl \e[044;37m while double-tapping \e[046;30m B \e[044;37m, then type \e[046;30m :detach \e[044;37m and hit \e[046;30m ENTER \e[044;37m :) \e[0m"
-    echo Are you ready to enter the console? [y/n]:
+    centerAndPrintString "\e[46;30mThere are multiple ways to exit nested tmux session (the server server console will be open as one):"
+    centerAndPrintString "\e[044mHold \e[043;30m Ctrl \e[044;37m while double-tapping \e[043;30m B \e[044;37m, then (let go of Ctrl)"
+    centerAndPrintString "\e[044;37m    hit \e[043;30m D \e[044;37m :)"
+    centerAndPrintString "\e[044;37mOR"
+    centerAndPrintString "\e[044;37m    type \e[043;30m :detach \e[044;37m and hit \e[043;30m ENTER \e[044;37m"
+    centerAndPrintString "\e[41mAre you ready to enter the console? [y/n]:"
     read enterstring
     if [[ "${enterstring,,}" == "y" ]]; then
         sudo tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "helpop user $username has entered console with maintainer script" ENTER
         sudo tmux -S /var/$tmuxName-tmux/$tmuxName attach -t $tmuxName
     elif [[ "${enterstring,,}" != "n" ]]; then
-        centerAndPrintString "\e[041mInvalid input, please type 'y' or 'n'\e[0m"
+        centerAndPrintString "\e[041mInvalid input, please type 'y' or 'n'"
         enterConsole
     fi
     echo
@@ -48,7 +52,7 @@ else
         if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-starter.sh" > /dev/null; then
             /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-starter.sh
         else
-            echo -e \\"e[41m> Couldn't start the server as module\\e[044mserver-starter\\e[041m is missing!\\e[0m"
+            centerAndPrintString "\e[41m> Couldn't start the server as module\e[044mserver-starter\e[041m is missing!"
         fi
     fi
     if ! [ ${tmuxName:+1} ]; then
