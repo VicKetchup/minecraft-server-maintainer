@@ -1,5 +1,8 @@
 # minecraft-server-maintainer
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![OS: Ubuntu 20.04 LTS \(Focal Fossa\)](https://img.shields.io/badge/OS-Ubuntu%2020.04%20LTS%20\(Focal%20Fossa\)-darkred.svg)](https://ubuntu.com/about/release-cycle#ubuntu)
+
 ![easyMaintainer](art/easyMaintainer.png?raw=true)
 
 This guide assumes you got a bare metal Ubuntu machine to run your server on.
@@ -72,3 +75,4 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![OS: Ubuntu 20.04 LTS \(Focal Fossa\)](https://img.shields.io/badge/OS-Ubuntu%2020.04%20LTS%20\(Focal%20Fossa\)-darkred.svg)](https://ubuntu.com/about/release-cycle#ubuntu)
