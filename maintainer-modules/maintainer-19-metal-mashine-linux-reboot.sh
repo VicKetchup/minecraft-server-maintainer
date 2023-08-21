@@ -58,7 +58,7 @@ function reboot() {
             fi
         fi
     fi
-    centerAndPrintString "\e[043;30m Exiting module and Rebooting... \e[040;37m"
+    centerAndPrintString "\e[043;30m Exiting module and Rebooting... "
     if [ ${isMaintainerRun:+1} ] && [[ "${isMaintainerRun}" == "true" ]]; then
         echo "~sudo reboot" >> $maintainerPath/maintainer-log.txt
     else
@@ -89,7 +89,7 @@ else
                         pid=$(pgrep -u root java 2>/dev/null)
                     fi
                     if [[ $pid =~ $numberReg ]]; then
-                        extramessage="Java session is still running on \e[044m $pid "
+                        extramessage="Java session is still running on \e[044m $pid \e[041m"
                         confirmation
                         unset extramessage
                         if $run; then

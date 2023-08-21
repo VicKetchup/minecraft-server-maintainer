@@ -12,6 +12,14 @@ defaultModuleArg=true
 defaultModuleArg2=false
 timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
 
+defaultMaintainerPath=/home/ubuntu
+if ! [ ${maintainerPath:+1} ]; then
+    maintainerPath=$defaultMaintainerPath
+fi
+maintainerModulesPath=$maintainerPath/maintainer-modules
+
+source $maintainerPath/maintainer-common.sh skipConfig=false
+
 # Get passed arguments
 for ARGUMENT in "$@"
 do
@@ -41,7 +49,6 @@ fi
 if ! [ ${modulearg2:+1} ]; then
     modulearg2=$defaultModuleArg2
 fi
-maintainerModulesPath=$maintainerPath/maintainer-modules
 
 # Functions
 function runOtherModules() {
@@ -180,6 +187,7 @@ function checkAttachedStatus {
 }
 
 function updateArgsToPassForNewExecution {
+    argsToPass=${argsToPass[*]/"newExecution=true"}
     argsToPass=('newExecution=false' "${argsToPass[@]}")
     if [[ "${argsToPass[*]}" != *"isMaintainerRun"* ]]; then
         argsToPass+=("isMaintainerRun=true")
@@ -206,7 +214,7 @@ function runModule {
     echo "$timestamp: $username has started '$module' module with arguments: $arguments" >> $maintainerPath/maintainer-log.txt
     updateOwnerships
     actualFileName=`ls $maintainerModulesPath/maintainer-[0-9]*-${module}.sh`
-    if $demo; then
+    if [[ "$demo" == "true" ]]; then
         centerAndPrintString "\e[043m Demo mode enabled, running module-example instead of $module"
         actualFileName=`ls $maintainerModulesPath/maintainer-[0-9]*-module-example.sh`
     fi
@@ -263,7 +271,7 @@ if [ ${getArgs:+1} ]; then # If getArgs is passed, print out default arguments
     fi
 else
     # Code
-    source $maintainerPath/maintainer-common.sh
+    source $maintainerPath/maintainer-common.sh skipConfig=true
     # Ensure we are in correct directory
     cd $maintainerPath
 
@@ -283,6 +291,7 @@ else
         fi
         unset usernames
         if $useSshUsers; then
+            configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
             # Get User Data
             while read -r line; do
                 if [[ "$line" == *"sshUsers__"* ]]; then
@@ -432,6 +441,7 @@ else
         fi
 
         if [[ "${newExecution}" == "true" ]]; then
+            argsToPass=${argsToPass[*]/"newExecution=true"}
             argsToPass+=("newExecution=false")
         fi
 
@@ -439,7 +449,7 @@ else
         firstExecutionRun=true
         while ${run}; 
         do
-            if $demo; then 
+            if [[ "$demo" == "true" ]]; then 
                 printLogoArg=true
                 clearArg=true
                 printFrames true true
@@ -506,7 +516,7 @@ else
                             serverStatusArgs+=" tmuxName=$tmuxName"
                         fi
                         updateOwnerships
-                        if $demo; then
+                        if [[ "$demo" == "true" ]]; then
                             centerAndPrintString "\e[043m Demo mode enabled, running module-example instead of $actualFileName"
                             /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-module-example.sh
                         else
@@ -715,7 +725,6 @@ else
     updateOwnerships
     skipSuccessLog=false
 fi
-
 # minecraft-server-maintaner - Level up your Minecraft Server Maintanance and Control!
 # Copyright (C) 2023  Viktor Tkachuk, aka. VicKetchup, from Ketchup&Co.
 #
