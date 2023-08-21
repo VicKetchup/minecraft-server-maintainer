@@ -308,17 +308,18 @@ if [ "$TERM_PROGRAM" != tmux ] && ! [[ $isMaintainerRun ]]; then
         centerAndPrintString "\e[46;30m Copy-Paste or Type to run :)"
     fi
 fi
-# This file is part of Minecraft Server-Maintainer.
+# minecraft-server-maintaner - Level up your Minecraft Server Maintanance and Control!
+# Copyright (C) 2023  Viktor Tkachuk, aka. VicKetchup, from Ketchup&Co.
 #
-# Minecraft Server-Maintainer is free software: you can redistribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# Minecraft Server-Maintainer is distributed in the hope that it will be useful,
+# This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Minecraft Server-Maintainer.  If not, see <https://www.gnu.org/licenses/>.
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.

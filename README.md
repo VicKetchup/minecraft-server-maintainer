@@ -1,4 +1,4 @@
-# Minecraft Server-Maintainer
+# minecraft-server-maintainer
 
 ![easyMaintainer](art/easyMaintainer.png?raw=true)
 
