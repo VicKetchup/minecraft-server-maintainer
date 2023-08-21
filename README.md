@@ -1,6 +1,7 @@
 # Minecraft Server-Maintainer
 
 ![easyMaintainer](art/easyMaintainer.png?raw=true)
+
 This guide assumes you got a bare metal Ubuntu machine to run your server on.
 
 ## Prerequisites
@@ -52,3 +53,5 @@ Distributed under the MIT License. See ` LICENSE ` for more information.
 Viktor Tkachuk - `vicketchup@gmail.com`
 
 Project Link: `https://github.com/VicKetchup/minecraft-server-maintainer`
+
+![License: GPL v3]
