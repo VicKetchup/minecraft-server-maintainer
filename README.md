@@ -1,4 +1,4 @@
-# Tags:
+#
 [![v: Beta V2.3.1](https://img.shields.io/badge/v-Beta%20V2.3.1-darkred.svg)](https://github.com/VicKetchup/minecraft-server-maintainer)
 [![OS: Ubuntu 20.04 LTS \(Focal Fossa\)](https://img.shields.io/badge/OS-Ubuntu%2022.04%20LTS%20\(Jammy%20Jellyfish\)-orange.svg)](https://ubuntu.com/about/release-cycle#ubuntu)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
