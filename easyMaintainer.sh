@@ -28,7 +28,7 @@ if [ ${getArgs:+1} ]; then
     fi
 else
     # Code
-    source $maintainerPath/maintainer-common.sh
+    source $maintainerPath/maintainer-common.sh skipConfig=true
     
     cd $maintainerPath
     /bin/bash ${maintainerPath}/maintainer.sh easyMode=true isMaintainerRun=true ${argsToPass[*]}

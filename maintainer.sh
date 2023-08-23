@@ -12,6 +12,8 @@ defaultModuleArg=true
 defaultModuleArg2=false
 timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
 
+source $maintainerPath/maintainer-common.sh skipConfig=false
+
 # Get passed arguments
 for ARGUMENT in "$@"
 do
@@ -180,6 +182,7 @@ function checkAttachedStatus {
 }
 
 function updateArgsToPassForNewExecution {
+    argsToPass=${argsToPass[*]/"newExecution=true"}
     argsToPass=('newExecution=false' "${argsToPass[@]}")
     if [[ "${argsToPass[*]}" != *"isMaintainerRun"* ]]; then
         argsToPass+=("isMaintainerRun=true")
@@ -263,7 +266,7 @@ if [ ${getArgs:+1} ]; then # If getArgs is passed, print out default arguments
     fi
 else
     # Code
-    source $maintainerPath/maintainer-common.sh
+    source $maintainerPath/maintainer-common.sh skipConfig=true
     # Ensure we are in correct directory
     cd $maintainerPath
 
@@ -283,6 +286,7 @@ else
         fi
         unset usernames
         if $useSshUsers; then
+            configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
             # Get User Data
             while read -r line; do
                 if [[ "$line" == *"sshUsers__"* ]]; then
@@ -432,6 +436,7 @@ else
         fi
 
         if [[ "${newExecution}" == "true" ]]; then
+            argsToPass=${argsToPass[*]/"newExecution=true"}
             argsToPass+=("newExecution=false")
         fi
 
@@ -439,7 +444,7 @@ else
         firstExecutionRun=true
         while ${run}; 
         do
-            if $demo; then 
+            if [[ "$demo" == "true" ]]; then 
                 printLogoArg=true
                 clearArg=true
                 printFrames true true

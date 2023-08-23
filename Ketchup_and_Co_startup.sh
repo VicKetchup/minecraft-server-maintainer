@@ -1,9 +1,6 @@
 #!/bin/bash
-printServerInfo=true
-clearForFrames=false
-export "tmuxName"="prison"
-source maintainer-common.sh clearForFrames=$clearForFrames
-sleep 1
+source maintainer-common.sh printServerInfo=true clearForFrames=false tmuxName="prison" skipConfig=true
+sleep 0.5
 
 function tryWindowsDriveInfo() {
     disk_info=`powershell.exe -c "wmic diskdrive get model,size" | sed -e '1d' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | awk 'NF>0 {model=substr($0, 1, 25); size=substr($0, 26); printf "%-25s %5.0fGB\n", model, size/1024/1024/1024}'`
@@ -73,6 +70,14 @@ function printFrames() {
     leftEdgeSymbols="\033[43;30m>> \033[41;33m ⛑  \033[47;30m > \033[42;30m"
     rightEdgeSymbols="\033[47m < \033[41;33m ⛑  \033[43;30m <<"
     centerAndPrintString "\e[42;30m Executing from \e[31m${0##*/}\e[30m"
+    centerAndPrintString "\e[44m"
+    centerAndPrintString "\e[44mDiscord:" 
+    centerAndPrintString "\e[44mhttps://discord.gg/SrCJffMVXp"
+    centerAndPrintString "\e[44m"
+    centerAndPrintString "\e[43;30mWays to support Ukraine"
+    centerAndPrintString "\e[43;30mhttps://ukrainianinstitute.org.uk/"
+    centerAndPrintString "\e[43;30mUkraine News:"
+    centerAndPrintString "\e[43;30mhttps://www.newsnow.co.uk/h/World+News/Europe/Eastern+Europe/Ukraine?type=ln"
     printLogo 0.1
     if $2; then 
         clear
