@@ -27,31 +27,6 @@ do
     export "$KEY"="$VALUE"
 done
 
-if ! [ ${demo:+1} ]; then
-    demo=$defaultDemo
-fi
-if ! [ ${clearForFrames:+1} ]; then
-    clearForFrames=$defaultClearForFrames
-fi
-if ! [ ${logSize:+1} ]; then
-    logSize=$defaultLogSize
-fi
-if ! [ ${tmuxName:+1} ]; then
-    tmuxName=$defaultTmuxName
-fi
-if ! [ ${jarName:+1} ]; then
-    jarName=$defaultJarName
-fi
-if ! [ ${maintainerMainUser:+1} ]; then
-    maintainerMainUser=$defaultMaintainerMainUser
-fi
-if ! [ ${maintainerPath:+1} ]; then
-    maintainerPath=$defaultMaintainerPath
-fi
-maintainerModulesPath=$maintainerPath/maintainer-modules
-
-footer="© \e[40;33mProduct of \e[31mVicKetchup\e[33m of \e[31mKetchup \e[37m& \e[31mCo\e[37m.\e[33m Please respect the copyright \e[0m©"
-
 function getVisibleLength() {
     local string="$1"
     # echo "getVisibleLength: input string: $string" >&2
@@ -227,7 +202,7 @@ function printFrames() {
         centerAndPrintString "\e[43;30mUkraine News:"
         centerAndPrintString "\e[43;30mhttps://www.newsnow.co.uk/h/World+News/Europe/Eastern+Europe/Ukraine?type=ln"
     fi
-    if $demo; then
+    if [[ "$demo" == "true" ]]; then
         if $1; then
             printLogo 1
         fi
@@ -285,7 +260,47 @@ function parse_yaml {
     }'
 }
 
-# Obtain or create maintaner-config.yaml
+# Set default values
+if ! [ ${maintainerPath:+1} ]; then
+    maintainerPath=$defaultMaintainerPath
+fi
+maintainerModulesPath=$maintainerPath/maintainer-modules
+footer="© \e[40;33mProduct of \e[31mVicKetchup\e[33m of \e[31mKetchup \e[37m& \e[31mCo\e[37m.\e[33m Please respect the copyright \e[0m©"
+if [[ "$skipConfig" == "true" ]]; then
+    # centerAndPrintString "\e[041mSkipping config as per passed argument..."
+    echo Skipping config as per passed argument... >> $maintainerPath/maintainer-log.txt
+else
+    centerAndPrintString "\e[042;30mmaintainer-config.yaml found, loading..."
+    # Load yaml data
+    configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
+    # Export variables
+    while read -r line; do
+        KEY=$(echo $line | cut -f1 -d=)
+        KEY_LENGTH=${#KEY}
+        VALUE="${line:$KEY_LENGTH+1}"
+        export "$KEY"="$VALUE"
+    done <<< "$configVars"
+fi
+# Fill in any blanks
+if ! [ ${demo:+1} ]; then
+    demo=$defaultDemo
+fi
+if ! [ ${clearForFrames:+1} ]; then
+    clearForFrames=$defaultClearForFrames
+fi
+if ! [ ${logSize:+1} ]; then
+    logSize=$defaultLogSize
+fi
+if ! [ ${tmuxName:+1} ]; then
+    tmuxName=$defaultTmuxName
+fi
+if ! [ ${jarName:+1} ]; then
+    jarName=$defaultJarName
+fi
+if ! [ ${maintainerMainUser:+1} ]; then
+    maintainerMainUser=$defaultMaintainerMainUser
+fi
+# Create maintaner-config.yaml if missing
 if ! [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
     centerAndPrintString "\e[041mmaintainer-config.yaml not found, creating one..."
     echo "demo: $demo" >> $maintainerPath/maintainer-config.yaml
@@ -301,29 +316,16 @@ if ! [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
     echo "# echo \$SSH_CONNECTION" >> $maintainerPath/maintainer-config.yaml
     echo "# Then run:" >> $maintainerPath/maintainer-config.yaml
     echo "# sudo grep -F ' from <first IP in output above> port <port (second number from output above)> ' /var/log/auth.log | grep ssh" >> $maintainerPath/maintainer-config.yaml
-elif [[ "$skipConfig" == "true" ]]; then
-    # centerAndPrintString "\e[041mSkipping config as per passed argument..."
-    echo Skipping config as per passed argument... >> $maintainerPath/maintainer-log.txt
-else
-    centerAndPrintString "\e[042;30mmaintainer-config.yaml found, loading..."
-    # Load yaml data
-    configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
-    # Export variables
-    while read -r line; do
-        KEY=$(echo $line | cut -f1 -d=)
-        KEY_LENGTH=${#KEY}
-        VALUE="${line:$KEY_LENGTH+1}"
-        export "$KEY"="$VALUE"
-    done <<< "$configVars"
 fi
-
+# Update window width for centerAndPrintString
 windowWidth=`tput cols`
+# Install tmux if not installed
 hasTmux=`dpkg -l | grep "tmux" | awk '{print $2}'`
 if [[ "$hasTmux" -ne "0" ]]; then
     sudo apt update
     sudo apt install tmux
 fi
-
+# Install minecraft-server-maintainer if not installed
 if ! [ -d "$maintainerModulesPath" ]; then
     # Download maintainer script from git and execute it if available - AI genereted
     if git clone https://github.com/VicKetchup/minecraft-server-maintainer minecraft-server-maintainer; then
@@ -340,7 +342,7 @@ if ! [ -d "$maintainerModulesPath" ]; then
         fi
     fi
 fi
-
+# Inform user about available maintainer scripts
 if [ "$TERM_PROGRAM" != tmux ] && ! [[ $isMaintainerRun ]]; then
     getMaintainerScripts
     if [ -n "$availableMaintainerScripts" ]; then

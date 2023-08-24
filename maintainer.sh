@@ -12,6 +12,12 @@ defaultModuleArg=true
 defaultModuleArg2=false
 timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
 
+defaultMaintainerPath=/home/ubuntu
+if ! [ ${maintainerPath:+1} ]; then
+    maintainerPath=$defaultMaintainerPath
+fi
+maintainerModulesPath=$maintainerPath/maintainer-modules
+
 source $maintainerPath/maintainer-common.sh skipConfig=false
 
 # Get passed arguments
@@ -209,7 +215,7 @@ function runModule {
     echo "$timestamp: $username has started '$module' module with arguments: $arguments" >> $maintainerPath/maintainer-log.txt
     updateOwnerships
     actualFileName=`ls $maintainerModulesPath/maintainer-[0-9]*-${module}.sh`
-    if $demo; then
+    if [[ "$demo" == "true" ]]; then
         centerAndPrintString "\e[043m Demo mode enabled, running module-example instead of $module"
         actualFileName=`ls $maintainerModulesPath/maintainer-[0-9]*-module-example.sh`
     fi
@@ -511,7 +517,7 @@ else
                             serverStatusArgs+=" tmuxName=$tmuxName"
                         fi
                         updateOwnerships
-                        if $demo; then
+                        if [[ "$demo" == "true" ]]; then
                             centerAndPrintString "\e[043m Demo mode enabled, running module-example instead of $actualFileName"
                             /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-module-example.sh
                         else
@@ -720,7 +726,6 @@ else
     updateOwnerships
     skipSuccessLog=false
 fi
-
 # minecraft-server-maintaner - Level up your Minecraft Server Maintanance and Control!
 # Copyright (C) 2023  Viktor Tkachuk, aka. VicKetchup, from Ketchup&Co.
 #
