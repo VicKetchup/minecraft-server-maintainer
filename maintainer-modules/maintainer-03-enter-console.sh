@@ -20,7 +20,9 @@ fi
 maintainerModulesPath=$maintainerPath/maintainer-modules
 
 # Functions
-source $maintainerPath/maintainer-common.sh
+if ! [ ${getArgs:+1} ]; then
+    source $maintainerPath/maintainer-common.sh skipConfig=false
+fi
 
 function enterConsole() {
     centerAndPrintString "\e[46;30mThere are multiple ways to exit nested tmux session (the server server console will be open as one):"

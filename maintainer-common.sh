@@ -41,7 +41,7 @@ function getVisibleLength() {
     # echo "getVisibleLength: visible length: $visibleLength" >&2
     echo "$visibleLength"
 }
-# Function to center and print a given string with a blue background
+# Function to center and print a given string
 function centerAndPrintString() {
     # Check if a shorter string was provided for use in case of a very slim window
     if [[ -n $centerAndPrintStringShort ]] && [[ $(getVisibleLength "$1") -gt "$windowWidth" ]]; then
@@ -159,34 +159,14 @@ function printFrame0() {
     echo
     echo
     centerAndPrintString "$footer"
-    sleep $1;
+    sleep $1; 
     clear
 }
 function printLogo() {
-    centerAndPrintString "\e[0m               ▄█▀▀▀▀▀▀█▄█\e[047m▀▒▒▒▒▒▒▒▒▀\e[0m█▄▄\e[0m" $2
-    centerAndPrintString "\e[0m                 \e[040m█         █\e[047m▒▒▒\e[0m         ▀██▀\e[0m" $2
-    centerAndPrintString "\e[0m                 \e[040m█         █▒    ██\e[0m☰☰☰☰☰☰█\e[0m" $2
-    centerAndPrintString "\e[0m                  ▀\e[040m█    ▒     █▄ █\e[0m   \e[044m▒☠ ▒█\e[0m" $2
-    centerAndPrintString "\e[0m                   \e[040m \e[047m▀\e[040m▄     ▄      ██\e[0m  \e[044m▒▒▒\e[047m█\e[0m" $2
-    centerAndPrintString "\e[0m    \e[043m▄\e[0m                \e[040m▄▀▒▀▄▄▄    ▒▒███\e[0m    ▄\e[047m▀\e[0m▀\e[047m█\e[0m" $2
-    centerAndPrintString "\e[0m         \e[041m▒█▒\e[0m             ▄\e[040m▀▒▒▒▒▒ ▀▄▀▒   ▒▒▀█████▒▒██▄\e[0m   ▒" $2
-    centerAndPrintString "\e[0m       ▄\e[041m█ █\e[0m▄          ▄\e[041m█▒▒▒▒▒▒▒▒▒▒\e[040m█▒▒    ▒▒▒██▒▒\e[041m▀▀\e[43m▀▀\e[0m▄▄▄" $2
-    centerAndPrintString "\e[0m    \e[041m█▒ ▒█\e[0m         ▄\e[041m▀            █\e[0m█▒▒▒▒▒▀████████ \e[0m" $2
-    centerAndPrintString "\e[0m   \e[041m█▒  ▒█\e[0m       ▄\e[041m▀                 \e[040m██▒▒▒▒▒█ ▒ ▒ █\e[0m" $2
-    centerAndPrintString "\e[0m   \e[041m█▒  ▒\e[0m█▀      \e[041m█ \e[037mKetchup&Co. █      \e[0m██ █ █      █ \e[0m" $2
-    centerAndPrintString "\e[0m  \e[041m█▒▒ ▒█\e[0m      \e[041m█             █\e[0m \e[41m█      \e[040m█  \e[0m██      █\e[0m" $2
-    centerAndPrintString "\e[0m  \e[041m█▒▒\e[0m \e[41m▒█\e[0m      \e[041m█             █\e[0m  \e[041m█      \e[040m█   \e[040m█    █\e[0m " $2
-    centerAndPrintString "\e[0m  \e[040m█\e[41m▒\e[0m   █    \e[41m█              █\e[040m   \e[041m█▒▒▒▒▒▒█\e[040m   █   █\e[0m" $2
-    centerAndPrintString "\e[0m     \e[040m█    █\e[0m   \e[041m█             █\e[0m     \e[040m█      \e[040m▀█▄▀    █\e[0m " $2
-    centerAndPrintString "\e[0m    \e[040m█    █\e[0m   \e[041m█             █\e[0m      \e[040m█             █\e[0m" $2
-    centerAndPrintString "\e[0m     \e[040m█    █\e[0m   \e[041m█             █\e[0m▄\e[44m▀▀▀▀▀▀\e[040m▄▄▄           ▀▄\e[0m" $2
-    centerAndPrintString "\e[0m   \e[040m█    █\e[0m   \e[041m█              █\e[44m        ▀▀▀\e[040m▄▄▄▄▄▄▄▄▄▄▀\e[0m" $2
-    centerAndPrintString "\e[0m \e[040m█    █\e[0m   \e[041m█              ▀█\e[44m    ▒▄▄▄▄▄▄▀▀▀▀▀▀█\e[0m▄" $2
-    centerAndPrintString "\e[0m  \e[040m█    █\e[0m    \e[041m█▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒\e[44m█     ▀             █\e[0m" $2
-    centerAndPrintString "\e[0m \e[040m█    ▀\e[0m▄  ▄█\e[044m▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀       ▒            █\e[0m" $2
-    centerAndPrintString "\e[0m \e[040m▀▄    ▀▀▀\e[44m▒                   ▄▄\e[0m▀\e[44m█\e[44m▒         ▒█\e[0m" $2
-    centerAndPrintString "$footer"
-    sleep $1;
+    if [ -f $maintainerPath/maintainer-ads.sh ]; then
+        source $maintainerPath/maintainer-ads.sh
+        selfPromo 1
+    fi
 }
 function printFrames() {
     if $1; then
@@ -266,10 +246,12 @@ if ! [ ${maintainerPath:+1} ]; then
 fi
 maintainerModulesPath=$maintainerPath/maintainer-modules
 footer="© \e[40;33mProduct of \e[31mVicKetchup\e[33m of \e[31mKetchup \e[37m& \e[31mCo\e[37m.\e[33m Please respect the copyright \e[0m©"
-if [[ "$skipConfig" == "true" ]]; then
-    # centerAndPrintString "\e[041mSkipping config as per passed argument..."
-    echo Skipping config as per passed argument... >> $maintainerPath/maintainer-log.txt
-else
+# Create log file if missing
+if ! [ -f "${maintainerPath}/maintainer-log.txt" ]; then
+    echo "Welcome to Maintainer log!" >> $maintainerPath/maintainer-log.txt
+    echo "Here you will find all data on execution of Maintainer script :)" >> $maintainerPath/maintainer-log.txt
+fi
+if [[ "$skipConfig" != "true" ]]; then
     centerAndPrintString "\e[042;30mmaintainer-config.yaml found, loading..."
     # Load yaml data
     configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)

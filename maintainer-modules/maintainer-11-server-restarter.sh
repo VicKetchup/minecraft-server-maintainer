@@ -28,7 +28,9 @@ fi
 maintainerModulesPath=$maintainerPath/maintainer-modules
 
 # Functions
-source $maintainerPath/maintainer-common.sh
+if ! [ ${getArgs:+1} ]; then
+    source $maintainerPath/maintainer-common.sh skipConfig=false
+fi
 
 function confirmation() {
     centerAndPrintString "\e[041mAre you sure about this? [y/n]"

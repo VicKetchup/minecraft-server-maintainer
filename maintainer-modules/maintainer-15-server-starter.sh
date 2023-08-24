@@ -44,7 +44,9 @@ fi
 serverPath=$maintainerPath/$serverFolder
 
 # Functions
-source $maintainerPath/maintainer-common.sh
+if ! [ ${getArgs:+1} ]; then
+    source $maintainerPath/maintainer-common.sh skipConfig=false
+fi
 
 function startJar() {
     tmux -S /var/$tmuxName-tmux/$tmuxName new -s $tmuxName -d

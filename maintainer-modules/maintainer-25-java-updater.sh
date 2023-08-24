@@ -22,7 +22,9 @@ if ! [ ${maintainerPath:+1} ]; then
 fi
 
 # Functions
-source $maintainerPath/maintainer-common.sh
+if ! [ ${getArgs:+1} ]; then
+    source $maintainerPath/maintainer-common.sh skipConfig=false
+fi
 
 function reboot() {
     centerAndPrintString "\e[042> Reboot is required, do you want to reboot now? [y/n]?"

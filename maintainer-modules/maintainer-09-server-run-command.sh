@@ -25,7 +25,9 @@ if ! [ ${maintainerPath:+1} ]; then
 fi
 
 # Function
-source $maintainerPath/maintainer-common.sh
+if ! [ ${getArgs:+1} ]; then
+    source $maintainerPath/maintainer-common.sh skipConfig=false
+fi
 
 function getCommandFromUser {
     centerAndPrintString "\e[042;30m> Please enter command to run <"

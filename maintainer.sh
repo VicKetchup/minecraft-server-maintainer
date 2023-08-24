@@ -21,6 +21,8 @@ maintainerModulesPath=$maintainerPath/maintainer-modules
 source $maintainerPath/maintainer-common.sh skipConfig=false
 
 # Get passed arguments
+unset argsToPass
+unset allArgs
 for ARGUMENT in "$@"
 do
     KEY=$(echo $ARGUMENT | cut -f1 -d=)
@@ -239,11 +241,11 @@ function runModule {
 
     if ([ ${exitOnEnd:+1} ] && [[ "${exitOnEnd}" == "true" ]]); then
         if [[ "${moduleRunSuccess}" == "true" ]]; then
-            echo -e \\"e[042;30m> Module run was successful!\\e[0;37m"
+            centerAndPrintString "\e[042;30m> Module run was successful!"
         else
-            echo -e \\"e[041m> Module run was NOT successful!"
+            centerAndPrintString "\e[041m> Module run was NOT successful!"
         fi
-        echo -e \\"e[042;30m> Exiting...\\e[0;37m"
+        centerAndPrintString "\e[042;30m> Exiting..."
         run=false
     fi
 }
@@ -258,6 +260,8 @@ function cleanUpLogs() {
         echo "<<<--- TRUNCATED LOGS --->>>" >> $maintainerPath/temp-maintainer-log.txt
         tail -n -$logSize ${maintainerPath}/maintainer-log.txt >> ${maintainerPath}/temp-maintainer-log.txt
         mv ${maintainerPath}/temp-maintainer-log.txt ${maintainerPath}/maintainer-log.txt
+        updateOwnerships
+        sleep 1
     fi
 }
 # Ensure user can't exit script without proper exit
@@ -323,7 +327,8 @@ else
     endScriptCommandString="not set"
     if $run; then
         updateOwnerships
-        if [ ! -f "${maintainerPath}/maintainer-log.txt" ]; then
+        if ! [ -f "${maintainerPath}/maintainer-log.txt" ]; then
+            echo Welcome log header
             echo "Welcome to Maintainer log!" >> $maintainerPath/maintainer-log.txt
             echo "Here you will find all data on execution of Maintainer script :)" >> $maintainerPath/maintainer-log.txt
         fi
@@ -367,11 +372,11 @@ else
                     fi
 
                     timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
-                    echo "Another session is running, waiting 60 seconds to try again..."
+                    echo "Another session is running, waiting 25 seconds to try again..."
                     echo "$timestamp: Another session is running, waiting 60 seconds to try again for session: $sessionId" >> $maintainerPath/maintainer-log.txt
                     echo >> $maintainerPath/maintainer-log.txt
                     updateOwnerships
-                    sleep 60
+                    sleep 25
                 fi
             done
         else
