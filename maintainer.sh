@@ -49,7 +49,6 @@ fi
 if ! [ ${modulearg2:+1} ]; then
     modulearg2=$defaultModuleArg2
 fi
-maintainerModulesPath=$maintainerPath/maintainer-modules
 
 # Functions
 function runOtherModules() {
