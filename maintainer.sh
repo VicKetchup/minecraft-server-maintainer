@@ -239,11 +239,11 @@ function runModule {
 
     if ([ ${exitOnEnd:+1} ] && [[ "${exitOnEnd}" == "true" ]]); then
         if [[ "${moduleRunSuccess}" == "true" ]]; then
-            echo -e \\"e[042;30m> Module run was successful!\\e[0;37m"
+            centerAndPrintString "\e[042;30m> Module run was successful!"
         else
-            echo -e \\"e[041m> Module run was NOT successful!"
+            centerAndPrintString "\e[041m> Module run was NOT successful!"
         fi
-        echo -e \\"e[042;30m> Exiting...\\e[0;37m"
+        centerAndPrintString "\e[042;30m> Exiting..."
         run=false
     fi
 }
@@ -258,6 +258,7 @@ function cleanUpLogs() {
         echo "<<<--- TRUNCATED LOGS --->>>" >> $maintainerPath/temp-maintainer-log.txt
         tail -n -$logSize ${maintainerPath}/maintainer-log.txt >> ${maintainerPath}/temp-maintainer-log.txt
         mv ${maintainerPath}/temp-maintainer-log.txt ${maintainerPath}/maintainer-log.txt
+        updateOwnerships
     fi
 }
 # Ensure user can't exit script without proper exit

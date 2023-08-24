@@ -50,7 +50,7 @@ function confirmation() {
 function reboot() {
     if [[ $pid =~ $numberReg ]]; then
         if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-server-backuper.sh" > /dev/null; then
-            /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-backuper.sh serverStop=true serverRestart=false "${allArgs[*]}"
+            /bin/bash ${maintainerModulesPath}/maintainer-[0-9]*-server-backuper.sh serverStop=true serverRestart=false skipSuccessLog=true"${allArgs[*]}"
             if [ ${isMaintainerRun:+1} ] && [[ "${isMaintainerRun}" == "true" ]]; then
                 cd $maintainerPath
                 head -n -1 maintainer-log.txt > temp-maintainer-log.txt; mv temp-maintainer-log.txt maintainer-log.txt
@@ -75,6 +75,10 @@ if [ ${getArgs:+1} ]; then
 else
     # Code
     unset extramessage
+    pid=$(pgrep -u ubuntu java 2>/dev/null)
+    if ! [[ $pid =~ $numberReg ]]; then
+        pid=$(pgrep -u root java 2>/dev/null)
+    fi
     if [[ "${forceRun}" == "false" ]]; then
         confirmation
         if $run; then
@@ -84,10 +88,6 @@ else
                 confirmation
                 unset extramessage
                 if $run; then
-                    pid=$(pgrep -u ubuntu java 2>/dev/null)
-                    if ! [[ $pid =~ $numberReg ]]; then
-                        pid=$(pgrep -u root java 2>/dev/null)
-                    fi
                     if [[ $pid =~ $numberReg ]]; then
                         extramessage="Java session is still running on \e[044m $pid \e[041m"
                         confirmation
