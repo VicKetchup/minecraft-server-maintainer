@@ -22,7 +22,9 @@ if ! [ ${maintainerPath:+1} ]; then
 fi
 
 # Functions
-source $maintainerPath/maintainer-common.sh
+if ! [ ${getArgs:+1} ]; then
+    source $maintainerPath/maintainer-common.sh skipConfig=false
+fi
 
 function exampleFunction() {
     centerAndPrintString "\e[042;30m> This is a module demo :)"

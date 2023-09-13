@@ -33,7 +33,9 @@ if ! [ ${colour:+1} ]; then
 fi
 
 # Functions
-source $maintainerPath/maintainer-common.sh
+if ! [ ${getArgs:+1} ]; then
+    source $maintainerPath/maintainer-common.sh skipConfig=false
+fi
 
 
 if [ ${getArgs:+1} ]; then
