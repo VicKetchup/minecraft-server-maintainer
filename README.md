@@ -25,11 +25,9 @@ This guide assumes you got a bare metal Ubuntu machine to run your server on.
 3. Type `./easyMaintainer.sh` or `./maintainer.sh`
 4. Hit `ENTER` and enjoy! 🙂
 
+(To setup your Maintainer username, follow instructions provided in maintainer-config.yaml file.)
+
 If you find any issues, please submit them to GitHub or message me on [Discord](https://discord.gg/SrCJffMVXp)🙂
-
-### Usage
-
-To setup your Maintainer username, follow instructions in provided maintainer-config.yaml file.
 
 ### Contributing
 
