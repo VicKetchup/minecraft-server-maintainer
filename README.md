@@ -22,8 +22,7 @@ This guide assumes you got a bare metal Ubuntu machine to run your server on.
 
 1. Download/Upload maintainer to your home directory (or wherever your server folder is located)
 2. Edit maintainer-config.yaml to suit your needs
-3. Type
-  - `./easyMaintainer.sh` or `./maintainer.sh`
+3. Type `./easyMaintainer.sh` or `./maintainer.sh`
 4. Hit `ENTER` and enjoy! 🙂
 
 If you find any issues, please submit them to GitHub or message me on [Discord](https://discord.gg/SrCJffMVXp)🙂
