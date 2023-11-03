@@ -248,6 +248,7 @@ if ! [ -f "${maintainerPath}/maintainer-log.txt" ]; then
     echo "Welcome to Maintainer log!" >> $maintainerPath/maintainer-log.txt
     echo "Here you will find all data on execution of Maintainer script :)" >> $maintainerPath/maintainer-log.txt
 fi
+# Load config if available and not skipped
 if [[ "$skipConfig" != "true" ]] && [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
     centerAndPrintString "\e[042;30mmaintainer-config.yaml found, loading..."
     # Load yaml data

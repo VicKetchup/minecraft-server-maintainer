@@ -68,6 +68,7 @@ function runOtherModules() {
 }
 
 function login() {
+    # If connectionsha is in shas, get username from usernames
     if [ ${shas:+1} ] && [[ "${shas[*]}" == *"$connectionsha"* ]]; then
         shasAmount=${#shas[*]}
         for (( i=0; i<${shasAmount}; i++ ));
