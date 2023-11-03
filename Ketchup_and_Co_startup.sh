@@ -109,7 +109,7 @@ function getMaintainerScripts() {
 }
 
 windowWidth=`tput cols`
-if [ "$TERM_PROGRAM" != tmux ]; then
+if [ "$TERM" != screen ]; then
     resize >/dev/null
     sleep 0.1
     footer=" \e[0m© \e[40;33mProduct of \e[31mVicKetchup\e[33m of \e[31mKetchup \e[37m& \e[31mCo\e[37m.\e[33m Please respect the copyright \e[0m© "

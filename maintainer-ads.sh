@@ -5,13 +5,18 @@ defaultMaintainerPath=/home/ubuntu
 
 for ARGUMENT in "$@"
 do
-    KEY=$(echo $ARGUMENT | cut -f1 -d=)
+    # Only do this if argument is key=value
+    if [[ "$ARGUMENT" != *"="* ]]; then
+        continue
+    else
+        KEY=$(echo $ARGUMENT | cut -f1 -d=)
 
-    KEY_LENGTH=${#KEY}
-    VALUE="${ARGUMENT:$KEY_LENGTH+1}"
-    allArgs+=("$KEY"="$VALUE")
+        KEY_LENGTH=${#KEY}
+        VALUE="${ARGUMENT:$KEY_LENGTH+1}"
+        allArgs+=("$KEY"="$VALUE")
 
-    export "$KEY"="$VALUE"
+        export "$KEY"="$VALUE"
+    fi
 done
 
 if ! [ ${maintainerPath:+1} ]; then

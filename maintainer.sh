@@ -162,7 +162,7 @@ function freeTypeUsername {
 
 function checkAttachedStatus {
     unset currentTmux
-    if [ "$TERM_PROGRAM" = tmux ]; then
+    if [ "$TERM" = screen ]; then
         while IFS= read -r line; do
             if [[ "${line}" == "maintainer" ]]; then
                 currentTmux="${line}"

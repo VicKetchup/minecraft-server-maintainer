@@ -1,6 +1,6 @@
 #!/bin/bash
 export "isMaintainerRun"="true"
-if [ "$TERM_PROGRAM" != tmux ]; then
+if [ "$TERM" != screen ]; then
     resize >/dev/null
 fi
 
@@ -300,7 +300,7 @@ fi
 # Update window width for centerAndPrintString
 windowWidth=`tput cols`
 # Inform user about available maintainer scripts
-if [ "$TERM_PROGRAM" != tmux ] && ! [[ $isMaintainerRun ]]; then
+if [ "$TERM" != screen ] && ! [[ $isMaintainerRun ]]; then
     getMaintainerScripts
     if [ -n "$availableMaintainerScripts" ]; then
         leftEdgeSymbols="\033[41;33m ⛑  \033[47;30m > \033[46m"
