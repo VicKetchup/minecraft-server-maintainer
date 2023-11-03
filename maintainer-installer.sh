@@ -63,7 +63,7 @@ if [ "$relogRequired" = true ]; then
     kill -s SIGHUP $$
 else
     # Execute maintainer-common.sh to create the config file if it doesn't exist
-    source "maintainer-common.sh"
+    ./maintainer-common.sh demo=false clearForFrames=false maintainerMainUser=$USER 
 
     # Install Minecraft Server
     echo -e "\e[43;30mInstalling minecraft server\e[0m"
