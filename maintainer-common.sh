@@ -203,11 +203,8 @@ function printFrames() {
         clear; 
     fi
 }
-function runInstaller() {
-    ./maintainer.sh module=server-installer
-}
 function getMaintainerScripts() {
-    scriptsToSearchFor=("./maintainer-common.sh" "./easyMaintainer.sh" "./maintainer.sh")
+    scriptsToSearchFor=("./maintainer-installer.sh" "./easyMaintainer.sh" "./maintainer.sh")
     foundScripts=()
     for script in "${scriptsToSearchFor[@]}"; do
         if [ -f "$script" ]; then
@@ -251,7 +248,7 @@ if ! [ -f "${maintainerPath}/maintainer-log.txt" ]; then
     echo "Welcome to Maintainer log!" >> $maintainerPath/maintainer-log.txt
     echo "Here you will find all data on execution of Maintainer script :)" >> $maintainerPath/maintainer-log.txt
 fi
-if [[ "$skipConfig" != "true" ]]; then
+if [[ "$skipConfig" != "true" ]] && [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
     centerAndPrintString "\e[042;30mmaintainer-config.yaml found, loading..."
     # Load yaml data
     configVars=$(parse_yaml $maintainerPath/maintainer-config.yaml)
@@ -301,29 +298,6 @@ if ! [ -f "${maintainerPath}/maintainer-config.yaml" ]; then
 fi
 # Update window width for centerAndPrintString
 windowWidth=`tput cols`
-# Install tmux if not installed
-hasTmux=`dpkg -l | grep "tmux" | awk '{print $2}'`
-if [[ "$hasTmux" -ne "0" ]]; then
-    sudo apt update
-    sudo apt install tmux
-fi
-# Install minecraft-server-maintainer if not installed
-if ! [ -d "$maintainerModulesPath" ]; then
-    # Download maintainer script from git and execute it if available - AI genereted
-    if git clone https://github.com/VicKetchup/minecraft-server-maintainer minecraft-server-maintainer; then
-        centerAndPrintString "\e[43;30mGit clone successful. Executing the maintainer script..."
-        cd minecraft-server-maintainer
-        runInstaller
-    else
-        centerAndPrintString "\e[42mGit clone failed. Trying to download from repository's maintainer-modules folder..."
-        if wget https://github.com/VicKetchup/minecraft-server-maintainer; then
-            echo "\e[43;30mDownload successful. Executing the maintainer script..."
-            runInstaller
-        else
-            echo "\e[41mDownload failed. The maintainer script is not available."
-        fi
-    fi
-fi
 # Inform user about available maintainer scripts
 if [ "$TERM_PROGRAM" != tmux ] && ! [[ $isMaintainerRun ]]; then
     getMaintainerScripts
