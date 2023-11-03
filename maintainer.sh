@@ -78,53 +78,58 @@ function login() {
         done
     else
         if $getUser; then
-            PS3="Select username:"
-
-            if [ -n $selectedusername ]; then
-                unset shaToCheckAgainstArray
-                unset shaToCheckAgainst
-                select selectedusername in ${usernames[*]}
-                do
-                    case $selectedusername in
-                        "Free-type")
-                            freeTypeUsername
-                            break;
-                        ;;
-                        *) 
-                            usernameIndex=$(($REPLY - 1))
-                            shaToCheckAgainstString="${shas[$usernameIndex]}"
-                            if [[ "${shaToCheckAgainstString}" == *"_"* ]]; then
-                                IFS='_' read -r -a shaToCheckAgainstArray <<< "$shaToCheckAgainstString"
-                            else
-                                shaToCheckAgainstArray+=($shaToCheckAgainstString)
-                            fi
-                            if [[ "${shaToCheckAgainstArray[0]}" == "NULL" ]]; then
-                                echo -e \\"e[041m> This username is reserved but not yet setup. Please select another username.\\e[0m\\n"
-                                login
-                            else
-                                shaIndex=0
-                                for shaToCheckAgainst in "${shaToCheckAgainstArray[*]}"
-                                do
-                                    shaIndex+=1
-                                    if [[ "$shaToCheckAgainst" == "$connectionsha" ]]; then
-                                        username=$selectedusername
-                                        getUser=false
-                                        break;
-                                    else
-                                        if [[ "${shaIndex}" == "${#sha[*]}" ]]; then
-                                            echo -e \\"e[041m> Sha didn't match! Please select another username.\\e[0m\\n"
-                                            login
-                                        fi
-                                    fi
-                                done
-                            fi
-                            break
-                        ;;
-                    esac
-                done
+            # If usernames only has "Free-type" in it, go straight to freeTypeUsername
+            if [[ "${usernames[*]}" == *"Free-type"* ]]; then
+                freeTypeUsername
             else
-                unset selectedusername
-                login
+                PS3="Select username:"
+
+                if [ -n $selectedusername ]; then
+                    unset shaToCheckAgainstArray
+                    unset shaToCheckAgainst
+                    select selectedusername in ${usernames[*]}
+                    do
+                        case $selectedusername in
+                            "Free-type")
+                                freeTypeUsername
+                                break;
+                            ;;
+                            *) 
+                                usernameIndex=$(($REPLY - 1))
+                                shaToCheckAgainstString="${shas[$usernameIndex]}"
+                                if [[ "${shaToCheckAgainstString}" == *"_"* ]]; then
+                                    IFS='_' read -r -a shaToCheckAgainstArray <<< "$shaToCheckAgainstString"
+                                else
+                                    shaToCheckAgainstArray+=($shaToCheckAgainstString)
+                                fi
+                                if [[ "${shaToCheckAgainstArray[0]}" == "NULL" ]]; then
+                                    echo -e \\"e[041m> This username is reserved but not yet setup. Please select another username.\\e[0m\\n"
+                                    login
+                                else
+                                    shaIndex=0
+                                    for shaToCheckAgainst in "${shaToCheckAgainstArray[*]}"
+                                    do
+                                        shaIndex+=1
+                                        if [[ "$shaToCheckAgainst" == "$connectionsha" ]]; then
+                                            username=$selectedusername
+                                            getUser=false
+                                            break;
+                                        else
+                                            if [[ "${shaIndex}" == "${#sha[*]}" ]]; then
+                                                echo -e \\"e[041m> Sha didn't match! Please select another username.\\e[0m\\n"
+                                                login
+                                            fi
+                                        fi
+                                    done
+                                fi
+                                break
+                            ;;
+                        esac
+                    done
+                else
+                    unset selectedusername
+                    login
+                fi
             fi
         else
             if [[ -n $username ]]; then
