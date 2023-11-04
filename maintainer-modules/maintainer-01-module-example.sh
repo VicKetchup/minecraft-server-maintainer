@@ -1,6 +1,6 @@
 #!/bin/bash
 # Set default variables here
-success=true
+success=false
 example="true"
 example2="false"
 defaultMaintainerPath=/home/ubuntu
@@ -22,10 +22,6 @@ if ! [ ${maintainerPath:+1} ]; then
 fi
 
 # Functions
-if ! [ ${getArgs:+1} ]; then
-    source $maintainerPath/maintainer-common.sh skipConfig=false
-fi
-
 function exampleFunction() {
     centerAndPrintString "\e[042;30m> This is a module demo :)"
     centerAndPrintString "\e[044mPassed Args were: ${allArgs[*]}"
@@ -40,10 +36,7 @@ if [ ${getArgs:+1} ]; then
     fi
 else
     # Code
-    source $maintainerPath/maintainer-common.sh
-    if [ true ]; then
-        success=false
-    fi
+    source $maintainerPath/maintainer-common.sh skipConfig=true
 
     exampleFunction
 

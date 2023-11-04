@@ -195,7 +195,7 @@ function checkAttachedStatus {
 }
 
 function updateArgsToPassForNewExecution {
-    argsToPass=${argsToPass[*]/"newExecution=true"}
+    argsToPass=("${argsToPass[@]/newExecution=true}")
     argsToPass=('newExecution=false' "${argsToPass[@]}")
     if [[ "${argsToPass[*]}" != *"isMaintainerRun"* ]]; then
         argsToPass+=("isMaintainerRun=true")
@@ -379,7 +379,7 @@ else
 
                     timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
                     echo "Another session is running, waiting 25 seconds to try again..."
-                    echo "$timestamp: Another session is running, waiting 60 seconds to try again for session: $sessionId" >> $maintainerPath/maintainer-log.txt
+                    echo "$timestamp: Another session is running, waiting 25 seconds to try again for session: $sessionId" >> $maintainerPath/maintainer-log.txt
                     echo >> $maintainerPath/maintainer-log.txt
                     updateOwnerships
                     sleep 25
@@ -397,7 +397,7 @@ else
                 fi
                 tmux -S /var/maintainer-tmux/maintainer new-session -s maintainer -d
                 updateArgsToPassForNewExecution
-                tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh newExecution=$newExecution ${argsToPass[*]}" ENTER
+                tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
                 echo Attaching to new tmux session...
                 tmux -S /var/maintainer-tmux/maintainer attach -t maintainer
                 realExit=false
@@ -440,20 +440,17 @@ else
                 fi
             fi
         else
-            if [ ${currentTmux:+1} ] && [[ "${newExecution}" == "true" ]]; then
+            if [ ${currentTmux:+1} ]; then
                 previousSessionId=`echo \`tmux -S /var/maintainer-tmux/maintainer capture-pane -pt maintainer\` | grep -o -P '(?<=> Session ID: ).{36}'`
-                echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
-                echo -e \\"e[044mYou are already in a maintainer tmux session!\\e[0m\\n"
-                echo Re-starting the script
-                echo "$timestamp: Re-starting maintainer session" >> $maintainerPath/maintainer-log.txt
-                updateArgsToPassForNewExecution
-                tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
+                if ! [ -n $previousSessionId]; then
+                    echo -e \\"n<< $previousSessionId\\n" >> $maintainerPath/maintainer-log.txt
+                    echo -e \\"e[044mYou are already in a maintainer tmux session!\\e[0m\\n"
+                    echo Re-starting the script
+                    echo "$timestamp: Re-starting maintainer session" >> $maintainerPath/maintainer-log.txt
+                    updateArgsToPassForNewExecution
+                    tmux -S /var/maintainer-tmux/maintainer send-keys -t maintainer:0.0 "./maintainer.sh ${argsToPass[*]}" ENTER
+                fi
             fi
-        fi
-
-        if [[ "${newExecution}" == "true" ]]; then
-            argsToPass=${argsToPass[*]/"newExecution=true"}
-            argsToPass+=("newExecution=false")
         fi
 
         # Main - module handler
@@ -563,7 +560,7 @@ else
                             ;;
                             *)
                                 if compgen -G "${maintainerModulesPath}/maintainer-[0-9]*-${module}.sh" > /dev/null; then
-                                    arguments="isMaintainerRun=true username=$username ${argsToPass[*]}"
+                                    arguments="${argsToPass[*]}"
                                     
                                     timestamp=$(date "+%Y-%m-%d-%H-%M-%S")
                                     runModule
