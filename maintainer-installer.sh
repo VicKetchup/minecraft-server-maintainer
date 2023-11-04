@@ -58,6 +58,16 @@ fi
 # Execute maintainer-common.sh to create the config file
 ./maintainer-common.sh demo=false clearForFrames=false maintainerMainUser=$USER
 
+# Add Ketchup_and_Co_startup.sh to .bashrc if not already added
+if ! grep -q "Ketchup_and_Co_startup.sh" ~/.bashrc; then
+    echo -e "\e[42mDo you want to add Ketchup_and_Co_startup.sh to .bashrc? (y/n)\e[0m"
+    read answer
+    if [ "$answer" != "${answer#[Yy]}" ]; then
+        echo -e "\e[42mAdding Ketchup_and_Co_startup.sh to .bashrc...\e[0m"
+        echo "bash $PWD/Ketchup_and_Co_startup.sh" >> ~/.bashrc
+    fi
+fi
+
 # If relogRequired is true, inform the user and force logout
 if [ "$relogRequired" = true ]; then
     echo -e "\e[43;30mLogging out to ensure changes take effect...\e[0m"
