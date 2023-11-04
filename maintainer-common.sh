@@ -1,5 +1,4 @@
 #!/bin/bash
-export "isMaintainerRun"="true"
 if [ "$TERM" != screen ]; then
     resize >/dev/null
 fi
