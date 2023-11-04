@@ -58,16 +58,27 @@ function confirmEula() {
             sed -i 's/eula=false/eula=true/g' $serverPath/eula.txt
         fi
     else
-        centerAndPrintString "\e[041mCannot find \e[0m\e[044m $serverPath/eula.txt \e[041m. Please read the EULA at \e[0m\e[044m https://account.mojang.com/documents/minecraft_eula \e[041m and then create \e[0m\e[044m $serverPath/eula.txt \e[041m with \e[0m\e[044m eula=true \e[041m to continue...\e[0m"
-        exit 1
+        startServer
+        confirmEula
     fi
 }
 
+function startServer() {
+    if ! $serverTmuxStarted; then
+        tmux -S /var/$tmuxName-tmux/$tmuxName new -s $tmuxName -d
+        tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "cd $serverPath" Enter
+        serverTmuxStarted=true
+    fi
+    startJar
+}
+
 function startJar() {
-    tmux -S /var/$tmuxName-tmux/$tmuxName new -s $tmuxName -d
-    tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "cd $serverPath" Enter
     tmux -S /var/$tmuxName-tmux/$tmuxName send-keys -t $tmuxName:0.0 "java -Xms${ramToUse}G -Xmx${ramToUse}G -XX:+UseG1GC -jar ${jarName}.jar nogui" Enter
-    success=true
+    if [ -f "$serverPath/eula.txt" ]; then
+        if grep -q "eula=true" "$serverPath/eula.txt"; then
+            success=true
+        fi
+    fi
 }
 
 if [ ${getArgs:+1} ]; then
@@ -106,8 +117,9 @@ else
                 centerAndPrintString "\e[044m> You can change these parameters by executing the script with jarName, serverFolder and ram parameters"
             fi
             echo
+            serverTmuxStarted=false
             confirmEula
-            startJar
+            startServer
         else
             centerAndPrintString "\e[041m Cannot start server as \e[0m\e[044m ${jarName}.jar \e[041m does not exist in \e[0m\e[044m $serverPath \e[0m\e[041m..."
         fi
