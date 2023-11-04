@@ -111,7 +111,8 @@ else
         fi
         infoString2="\e[47;30mcpu-usage\e[0m\e[44m=$cpuColor$javaCPU%%\e[0m\e[44m | \e[47;30mram-usage\e[0m\e[44m=$RAMColor$javaRAMPercent%%\e[0m\e[44m | ram-raw=${javaRam}G | backups-size=${storageTakenUpByBackups}"
         
-        serverStatusData=$(curl -s -H "Accept: application/json" -H "Content-Type: application/json" -X GET "https://api.mcstatus.io/v2/status/java/198.27.69.163")
+        serverIp=`hostname -I | awk '{print $1}'`
+        serverStatusData=$(curl -s -H "Accept: application/json" -H "Content-Type: application/json" -X GET "https://api.mcstatus.io/v2/status/java/$serverIp")
         infoString3="version=$(jq -r '.version.name_raw' <<<"$serverStatusData") | host=$(jq -r '.host' <<<"$serverStatusData") | port=$(jq -r '.port' <<<"$serverStatusData")"
         conditionalInfo="online=$(jq -r '.online' <<<"$serverStatusData") | online-players=$(jq -r '.players.online' <<<"$serverStatusData") | max-players=$(jq -r '.players.max' <<<"$serverStatusData")"
         conditionalMotd="\e[47;30mmotd\e[0m\e[44m=\e[42;30m$(jq -r '.motd.clean' <<<"$serverStatusData")\e[0m\e[44m"
