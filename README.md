@@ -20,10 +20,10 @@ This guide assumes you got a bare metal Ubuntu machine to run your server on.
 
 ## Installation
 
-1. Download/Upload maintainer to your home directory (or wherever your server folder is located)
-2. Edit maintainer-config.yaml to suit your needs
-3. Type `./easyMaintainer.sh` or `./maintainer.sh`
-4. Hit `ENTER` and enjoy! 🙂
+1. Download/Upload maintainer-installer.sh to your home directory (or wherever your server folder is located)
+2. Give it execution permissions `chmod +x maintainer-installer.sh`
+3. Run it as the parent shell `. maintainer-installer.sh`
+4. Execute `./easyMaintainer.sh` or `./maintainer.sh` and enjoy! 🙂
 
 (To setup your Maintainer username, follow instructions provided in maintainer-config.yaml file.)
 
