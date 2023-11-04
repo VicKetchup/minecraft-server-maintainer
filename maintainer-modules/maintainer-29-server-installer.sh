@@ -46,7 +46,10 @@ function installed() {
 
 function download() {
     downloaded=1
-    if wget "https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/116/downloads/paper-1.20.1-116.jar" -O "$defaultPath/$jarName.jar" > /dev/null; then
+    if ! [ -d "$path" ]; then
+        mkdir -p $path
+    fi
+    if wget "https://api.papermc.io/v2/projects/paper/versions/1.20.1/builds/116/downloads/paper-1.20.1-116.jar" -O "$path/$jarName.jar" > /dev/null; then
         downloaded=0
     fi
     return $downloaded

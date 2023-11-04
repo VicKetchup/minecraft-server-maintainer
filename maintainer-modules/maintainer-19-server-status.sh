@@ -46,6 +46,13 @@ if [ ${getArgs:+1} ]; then
     fi
 else
     # Code
+    # Install jq if not installed
+    if ! which jq >/dev/null; then
+        echo -e "\e[42mInstalling jq...\e[0m"
+        sudo apt update
+        sudo apt install jq
+    fi
+
     if ! [ ${tmuxName:+1} ]; then
         tmuxName=$defaultTmuxName
     fi
@@ -98,7 +105,10 @@ else
         fi
         javaRAMBytes=$(ps aux | grep java | grep -v grep | awk '{print $6}')
         javaRam=$(echo "scale=2; $javaRAMBytes / 1024 / 1024" | bc)
-        storageTakenUpByBackups=$(cd /backups; du -sh --exclude "./lost+found" | awk '{print $1}' | awk '{print $1}'; cd ~)
+        storageTakenUpByBackups="0B"
+        if [ -d /backups ]; then
+            storageTakenUpByBackups=$(cd /backups; du -sh --exclude "./lost+found" | awk '{print $1}' | awk '{print $1}'; cd ~)
+        fi
         infoString2="\e[47;30mcpu-usage\e[0m\e[44m=$cpuColor$javaCPU%%\e[0m\e[44m | \e[47;30mram-usage\e[0m\e[44m=$RAMColor$javaRAMPercent%%\e[0m\e[44m | ram-raw=${javaRam}G | backups-size=${storageTakenUpByBackups}"
         
         serverStatusData=$(curl -s -H "Accept: application/json" -H "Content-Type: application/json" -X GET "https://api.mcstatus.io/v2/status/java/198.27.69.163")

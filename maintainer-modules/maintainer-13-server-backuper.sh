@@ -82,6 +82,13 @@ if [ ${getArgs:+1} ]; then
     fi
 else
     # Code
+    # Install zip if not installed
+    if ! which zip >/dev/null; then
+        echo -e "\e[42mInstalling Zip...\e[0m"
+        sudo apt update
+        sudo apt install zip
+    fi
+
     success=false
     if [[ "$mode" == "local" ]]; then
         backupPath="$maintainerPath/$relativeBackupPath"
