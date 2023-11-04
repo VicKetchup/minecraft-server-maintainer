@@ -55,17 +55,13 @@ else
     echo -e "\e[43;30mMaintainer scripts already exist. Skipping...\e[0m"
 fi
 
+# Execute maintainer-common.sh to create the config file
+./maintainer-common.sh demo=false clearForFrames=false maintainerMainUser=$USER
+
 # If relogRequired is true, inform the user and force logout
 if [ "$relogRequired" = true ]; then
-    echo -e "\e[43;30mLogging out to ensure changes take effect, please re-run installer afterwards...\e[0m"
+    echo -e "\e[43;30mLogging out to ensure changes take effect...\e[0m"
     echo -e "\e[41mPress any key to continue...\e[0m"
     read -n 1 -s
-    kill -s SIGHUP $$
-else
-    # Execute maintainer-common.sh to create the config file if it doesn't exist
-    ./maintainer-common.sh demo=false clearForFrames=false maintainerMainUser=$USER 
-
-    # Install Minecraft Server
-    echo -e "\e[43;30mInstalling minecraft server\e[0m"
-    ./maintainer.sh module=server-installer
+    exit
 fi
